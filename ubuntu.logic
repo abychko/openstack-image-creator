@@ -1,0 +1,6 @@
+DEBOOTSTRAP=$(which debootstrap)
+PKGLIST=vim,mc,bash-completion,screen,less,bzip2
+if [ ${ARCH} = x86_64 ]; then
+	ARCH=amd64
+fi
+MIRROR=http://archive.ubuntu.com/ubuntu

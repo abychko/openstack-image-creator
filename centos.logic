@@ -1,0 +1,5 @@
+RPM=$(which rpm)
+if [ ${ARCH} = amd64 ]; then
+	ARCH=x86_64
+fi
+MIRROR=http://mirror.centos.org/centos-${RELEASE}/${RELEASE}/os/${ARCH}
