@@ -11,7 +11,8 @@ Where required are:
 Additional params, not required:
 	--imagesize <size>, default is 2G, for minimal image
 	--remove-raw, default is no, to remove raw image after converting to compressed qcow2
-	--root-password, default is auto-generated. it will be stored together with your image
+	--root-password, default is auto-generated
+	--cloud-user, default jenkins
 	"
 }
 #
@@ -35,6 +36,7 @@ QEMU_IMG=$(which qemu-img)
 ROOT_PASSWORD=$(pwgen -s 14 1)
 REMOVE_RAW=no
 INTERACTIVE=no
+CLOUD_USER=jenkins
 #
 # Trying to parse the options passed to script
 while [ $# -gt 1 ]; do
@@ -44,28 +46,32 @@ while [ $# -gt 1 ]; do
 			exit 0
 			;;
 		--distro )
-			DISTRO=$2
+			export DISTRO=$2
 			shift 2
 			;;
 		--arch )
-			ARCH=$2
+			export ARCH=$2
 			shift 2
 			;;
 		--release )
-			RELEASE=$2
+			export RELEASE=$2
 			shift 2
 			;;
 		--imagesize )
-			IMAGESIZE=$2
+			export IMAGESIZE=$2
 			shift 2
 			;;
 		--root-password )
-			ROOT_PASSWORD=$2
+			export ROOT_PASSWORD=$2
 			shift 2
 			;;
 		--remove-raw )
-			REMOVE_RAW=yes
+			export REMOVE_RAW=yes
 			shift
+			;;
+		--cloud-user )
+			export CLOUD_USER=$2
+			shift 2
 			;;
 		*)
 			echo "* Wrong param or value: $1"
@@ -74,8 +80,6 @@ while [ $# -gt 1 ]; do
 			;;
 	esac
 done
-#
-set -e
 #
 PARTED=$(which parted)
 KPARTX=$(which kpartx)
@@ -125,6 +129,7 @@ tune2fs -i 0 /dev/mapper/${LOOP_DEVICE}
 mount -o loop /dev/mapper/${LOOP_DEVICE} ${MOUNTDIR}
 ##
 installBaseSystem
+setLocale
 createSourceList
 upgradeSystem
 adjustCloudSettings
@@ -132,14 +137,13 @@ configureFSTab
 configureBoot
 configureNetwork
 cleanupSystem
-setLocale
 setupConsole
 echo "root password for ${QCOW2_IMAGE} is ${ROOT_PASSWORD}" > ${FILENAME}.passwd
 chroot ${MOUNTDIR} sh -c "echo root:${ROOT_PASSWORD} | chpasswd"
-chroot ${MOUNTDIR} adduser --gecos ${DISTRO}-cloud-init-user --disabled-password --quiet ${DISTRO}
+chroot ${MOUNTDIR} adduser --gecos ${DISTRO}-cloud-user --disabled-password --quiet ${CLOUD_USER}
 mkdir -p ${MOUNTDIR}/etc/sudoers.d
-echo "${DISTRO} ALL = NOPASSWD: ALL" > ${MOUNTDIR}/etc/sudoers.d/debian-cloud-init
-chmod 0440 ${MOUNTDIR}/etc/sudoers.d/debian-cloud-init
+echo "${CLOUD_USER} ALL = NOPASSWD: ALL" > ${MOUNTDIR}/etc/sudoers.d/${CLOUD_USER}-cloud-init
+chmod 0440 ${MOUNTDIR}/etc/sudoers.d/${CLOUD_USER}-cloud-init
 #
 chroot ${MOUNTDIR} umount /proc || true
 umount ${MOUNTDIR}
