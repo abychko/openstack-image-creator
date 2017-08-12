@@ -1,6 +1,121 @@
+NEEDED_PACKAGES=sudo,openssh-server,euca2ools,file,kbd,lsof
+PKGLIST=${NEEDED_PACKAGES},vim,bash-completion,screen,less,bzip2,acpid
 DEBOOTSTRAP=$(which debootstrap)
-PKGLIST=vim,mc,bash-completion,screen,less,bzip2
-if [ ${ARCH} = x86_64 ]; then
-	ARCH=amd64
-fi
 MIRROR=http://archive.ubuntu.com/ubuntu
+#
+if [ ${ARCH} = x86_64 ]; then
+  ARCH=amd64
+fi
+#
+installBaseSystem(){
+  echo "* Installing Ubuntu ${RELEASE} ${ARCH} system to ${MOUNTDIR}"
+  debootstrap --arch=${ARCH} --verbose --include=${PKGLIST},${KERNEL} ${RELEASE} ${MOUNTDIR} ${MIRROR}
+}
+#
+setLocale(){
+  # set locale
+  echo "en_US.UTF-8 UTF-8" >> ${MOUNTDIR}/etc/locale.gen
+  chroot ${MOUNTDIR} locale-gen en_US.UTF-8
+  chroot ${MOUNTDIR} update-locale LANG=en_US.UTF-8
+}
+#
+createSourceList(){
+  echo "deb ${MIRROR} ${RELEASE} main restricted universe multiverse" > ${MOUNTDIR}/etc/apt/sources.list
+  echo "deb ${MIRROR} ${RELEASE}-updates main restricted universe multiverse" >> ${MOUNTDIR}/etc/apt/sources.list
+  echo "deb ${MIRROR} ${RELEASE}-security main restricted universe multiverse" >> ${MOUNTDIR}/etc/apt/sources.list
+  echo "deb ${MIRROR} ${RELEASE}-backports main restricted universe multiverse" >> ${MOUNTDIR}/etc/apt/sources.list
+}
+#
+upgradeSystem(){
+  chroot ${MOUNTDIR} apt-get update
+  chroot ${MOUNTDIR} bash -c "DEBIAN_FRONTEND=noninteractive apt-get -y install cloud-init cloud-utils linux-image-virtual extlinux mc cloud-initramfs-growroot"
+  chroot ${MOUNTDIR} apt-get -y dist-upgrade
+}
+#
+adjustCloudSettings(){
+  #
+  echo "# to update this file, run dpkg-reconfigure cloud-init
+datasource_list: [ Ec2 ]" > ${MOUNTDIR}/etc/cloud/cloud.cfg.d/90_dpkg.cfg
+  #
+  # Allow SSH in as root, even though it might be unsecure
+  sed -i 's/disable_root: true/disable_root: false/' ${MOUNTDIR}/etc/cloud/cloud.cfg
+  sed -i "s/name: ubuntu/name: ${CLOUD_USER}/" ${MOUNTDIR}/etc/cloud/cloud.cfg
+  # Since we implemented "backdoor" we want to be able to use it :)
+  sed -i "s/PermitRootLogin yes/PermitRootLogin without-password/" ${MOUNTDIR}/etc/ssh/sshd_config
+  #
+  # set timezone
+  cp ${MOUNTDIR}/usr/share/zoneinfo/America/New_York ${MOUNTDIR}/etc/localtime
+}
+#
+configureFSTab(){
+# Setup fstab
+  echo "# /etc/fstab: static file system information.
+proc  /proc  proc  nodev,noexec,nosuid  0  0
+/dev/vda1  /  ext4  errors=remount-ro  0  1
+" > ${MOUNTDIR}/etc/fstab
+}
+#
+configureBoot(){
+  # Setting-up initramfs
+  chroot ${MOUNTDIR} update-initramfs -u
+  KERNEL=`chroot ${MOUNTDIR} find boot -name 'vmlinuz-*'`
+  RAMDISK=`chroot ${MOUNTDIR} find boot -name 'initrd.img-*'`
+  UUID=`blkid -o value -s UUID /dev/mapper/${LOOP_DEVICE}`
+  mkdir -p ${MOUNTDIR}/boot/extlinux
+  extlinux --install ${MOUNTDIR}/boot/extlinux
+  chroot ${MOUNTDIR} ln -snf . /boot/boot
+  echo "default linux
+timeout 10
+label linux
+kernel /${KERNEL}
+append initrd=/${RAMDISK} root=/dev/vda1 console=tty0 console=ttyS0,115200 net.ifnames=0 ro" > ${MOUNTDIR}/boot/extlinux/extlinux.conf
+}
+configureNetwork(){
+  echo "# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The normal eth0
+auto eth0
+iface eth0 inet dhcp
+" > ${MOUNTDIR}/etc/network/interfaces
+}
+#
+configureModules(){
+  echo "# disable pc speaker
+blacklist pcspkr" > ${MOUNTDIR}/etc/modprobe.d/blacklist.conf
+echo "# Required for cinder hotplug
+acpiphp
+pci_hotplug
+" >> ${MOUNTDIR}/etc/modules
+}
+#
+cleanupSystem(){
+  rm -f ${MOUNTDIR}/etc/ssh/ssh_host_*
+  rm -f ${MOUNTDIR}/etc/udev/rules.d/70-persistent-net.rules
+  rm -f ${MOUNTDIR}/lib/udev/write_net_rules
+  rm -fv ${MOUNTDIR}/var/cache/apt/archives/*.deb
+}
+#
+setupConsole(){
+  if [ -d ${MOUNTDIR}/etc/systemd ]; then
+    mkdir -p ${MOUNTDIR}/etc/systemd/system/getty@tty1.service.d
+    echo '[Service]
+TTYVTDisallocate=no' > ${MOUNTDIR}/etc/systemd/system/getty@tty1.service.d/noclear.conf
+    chroot ${MOUNTDIR} systemctl enable serial-getty@ttyS0.service
+  fi
+  if [ -f ${MOUNTDIR}/etc/kbd/config ]; then
+    # Turn off console blanking which is *very* annoying and increase KEYBOARD_DELAY because it can be annoying over network.
+    sed -i s/^BLANK_TIME=.*/BLANK_TIME=0/ ${MOUNTDIR}/etc/kbd/config
+    sed -i s/^POWERDOWN_TIME=.*/POWERDOWN_TIME=0/ ${MOUNTDIR}/etc/kbd/config
+    sed -i 's/^[ \t#]KEYBOARD_DELAY=.*/KEYBOARD_DELAY=1000/' ${MOUNTDIR}/etc/kbd/config
+  fi
+}
+#
+setHostname(){
+  echo "${DISTRO}.${RELEASE}.openstack" > ${MOUNTDIR}/etc/hostname
+}
+#
