@@ -96,7 +96,10 @@ RAW_IMAGE=${FILENAME}.raw
 QCOW2_IMAGE=${FILENAME}.qcow2
 PASSWD_FILE=${FILENAME}.passwd
 MOUNTDIR=$(mktemp -d -t ${FILENAME}.XXXXXX)
-OUTDIR=${DISTRO}
+#
+if [ -z "${OUTDIR}" ]; then
+  OUTDIR=${DISTRO}
+fi
 #
 . $(dirname $0)/${DISTRO}.logic
 #
