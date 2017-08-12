@@ -215,6 +215,17 @@ if [ ${REMOVE_RAW} = yes ]; then
   rm -fv ${RAW_IMAGE}
 fi
 #
+echo '
+*
+*
+*
+'
+#
 echo "* Image done - ${OUTDIR}/${QCOW2_IMAGE}"
 echo "* Password for ${QCOW2_IMAGE} is saved to ${OUTDIR}/${FILENAME}.passwd"
 #
+echo '
+*
+*
+*
+'
