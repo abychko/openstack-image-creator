@@ -203,9 +203,9 @@ kpartx -d ${RAW_IMAGE}
 echo "* converting RAW image ${RAW_IMAGE} to QCOW2 ..."
 ${QEMU_IMG} convert -c -f raw ${RAW_IMAGE} -O qcow2 ${QCOW2_IMAGE}
 #
-MNTDEVICE=$(${LOSETUP} --all | grep ${RAW_IMAGE} | awk -F':' '{print $1}')
-echo "* removing loop device ${MNTDEVICE} ..."
-${LOSETUP} -v --detach ${MNTDEVICE}
+#MNTDEVICE=$(${LOSETUP} --all | grep ${RAW_IMAGE} | awk -F':' '{print $1}')
+#echo "* removing loop device ${MNTDEVICE} ..."
+#${LOSETUP} -v --detach ${MNTDEVICE}
 #
 mkdir -p ${OUTDIR}
 mv -fv ${FILENAME}.qcow2 ${FILENAME}.passwd ${OUTDIR}
@@ -215,6 +215,6 @@ if [ ${REMOVE_RAW} = yes ]; then
   rm -fv ${RAW_IMAGE}
 fi
 #
-echo "* Image done - ${QCOW2_IMAGE}"
-echo "* Password for ${QCOW2_IMAGE} is saved to ${FILENAME}.passwd"
+echo "* Image done - ${OUTDIR}/${QCOW2_IMAGE}"
+echo "* Password for ${QCOW2_IMAGE} is saved to ${OUTDIR}/${FILENAME}.passwd"
 #

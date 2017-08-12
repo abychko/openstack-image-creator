@@ -30,6 +30,7 @@ upgradeSystem(){
   chroot ${MOUNTDIR} apt-get update
   chroot ${MOUNTDIR} bash -c "DEBIAN_FRONTEND=noninteractive apt-get -y install cloud-init cloud-utils linux-image-virtual extlinux mc cloud-initramfs-growroot"
   chroot ${MOUNTDIR} apt-get -y dist-upgrade
+  chroot ${MOUNTDIR} apt-get -y autoremove || true
 }
 #
 adjustCloudSettings(){
@@ -105,7 +106,7 @@ setupConsole(){
     mkdir -p ${MOUNTDIR}/etc/systemd/system/getty@tty1.service.d
     echo '[Service]
 TTYVTDisallocate=no' > ${MOUNTDIR}/etc/systemd/system/getty@tty1.service.d/noclear.conf
-    chroot ${MOUNTDIR} systemctl enable serial-getty@ttyS0.service
+    chroot ${MOUNTDIR} systemctl enable serial-getty@ttyS0.service || true
   fi
   if [ -f ${MOUNTDIR}/etc/kbd/config ]; then
     # Turn off console blanking which is *very* annoying and increase KEYBOARD_DELAY because it can be annoying over network.
