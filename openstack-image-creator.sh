@@ -98,7 +98,7 @@ PASSWD_FILE=${FILENAME}.passwd
 MOUNTDIR=$(mktemp -d -t ${FILENAME}.XXXXXX)
 #
 if [ -z "${OUTDIR}" ]; then
-  OUTDIR=${DISTRO}
+  OUTDIR=OpenStack/$(date +%Y%m%d)/${DISTRO}
 fi
 #
 . $(dirname $0)/${DISTRO}.logic
