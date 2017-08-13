@@ -98,7 +98,7 @@ PASSWD_FILE=${FILENAME}.passwd
 MOUNTDIR=$(mktemp -d -t ${FILENAME}.XXXXXX)
 #
 if [ -z "${OUTDIR}" ]; then
-  OUTDIR=OpenStack/$(date +%Y%m%d)/${DISTRO}
+  OUTDIR=OpenStack/$(date +%Y%m%d)/${DISTRO}/${ARCH}
 fi
 #
 . $(dirname $0)/${DISTRO}.logic
@@ -201,7 +201,8 @@ rmdir ${MOUNTDIR}
 # Run FSCK
 echo "* running fsck on /dev/mapper/${LOOP_DEVICE} ..."
 fsck.ext4 -f -y /dev/mapper/${LOOP_DEVICE} || true
-kpartx -d ${RAW_IMAGE}
+echo "* detaching ${RAW_IMAGE} ..."
+kpartx -dv ${RAW_IMAGE}
 #
 echo "* converting RAW image ${RAW_IMAGE} to QCOW2 ..."
 ${QEMU_IMG} convert -c -f raw ${RAW_IMAGE} -O qcow2 ${QCOW2_IMAGE}
