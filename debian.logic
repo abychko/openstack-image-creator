@@ -51,7 +51,7 @@ datasource_list: [ Ec2 ]" > ${MOUNTDIR}/etc/cloud/cloud.cfg.d/90_dpkg.cfg
 }
 #
 upgradeSystem(){
-  chroot ${MOUNTDIR} apt-get -y install cloud-init cloud-utils cloud-initramfs-growroot
+  chroot ${MOUNTDIR} apt-get -y --force-yes install cloud-init cloud-utils cloud-initramfs-growroot
   chroot ${MOUNTDIR} apt-get -y dist-upgrade
   chroot ${MOUNTDIR} apt-get -y autoremove || true
 }
