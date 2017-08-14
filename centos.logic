@@ -6,13 +6,11 @@ RPM=$(which rpm)
 YUM=$(which yum)
 #
 if [ ${ARCH} = amd64 ]; then
-	mARCH=x86_64
-	BASEARCH=${ARCH}
+	ARCH=x86_64
 fi
 #
 if [ ${ARCH} = i386 ]; then
-	mARCH=i686
-	BASEARCH=${ARCH}
+	cmdPREFIX="setarch ${ARCH}"
 fi
 #
 MIRROR=http://mirror.centos.org/centos-${RELEASE}/${RELEASE}/os/${ARCH}
@@ -20,11 +18,10 @@ MIRROR=http://mirror.centos.org/centos-${RELEASE}/${RELEASE}/os/${ARCH}
 createTempYumConf(){
 	echo "[main]
 reposdir=${MOUNTDIR}/etc/yum.repos.d
-exactarch=1
+exactarch=0
 obsoletes=1
 debuglevel=2
 gpgcheck=0
-basearch=${ARCH}
 " > /tmp/yum.conf
 }
 #
@@ -35,12 +32,10 @@ cachedir=/var/cache/yum/${BASEARCH}/${RELEASE}'
 keepcache=0
 debuglevel=2
 logfile=/var/log/yum.log
-exactarch=1
+exactarch=0
 obsoletes=1
 gpgcheck=1
 plugins=1
-arch=${mARCH}
-basearch=${BASEARCH}
 distroverpkg=centos-release
 " > ${MOUNTDIR}/etc/yum/yum.conf
 }
@@ -57,8 +52,8 @@ installBaseSystem(){
 	echo "nameserver 8.8.8.8" > ${MOUNTDIR}/etc/resolv.conf
 	createTempYumConf
 	createImageYumConf
-	${YUM} --config=/tmp/yum.conf --installroot=${MOUNTDIR} install -y rpm yum
+	${cmdPREFIX} ${YUM} --config=/tmp/yum.conf --installroot=${MOUNTDIR} install -y rpm yum
 	chroot ${MOUNTDIR} rpm -i --force /centos-release-${RELEASE}.rpm
-	chroot ${MOUNTDIR} yum -y groupinstall base
+	${cmdPREFIX} chroot ${MOUNTDIR} yum -y groupinstall base
 	rm -fv /tmp/yum.conf ${MOUNTDIR}/centos-release-${RELEASE}.rpm
 }
