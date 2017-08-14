@@ -1,3 +1,6 @@
+#
+set -e
+#
 NEEDED_PACKAGES=sudo,openssh-server,file,kbd,lsof
 PKGLIST=${NEEDED_PACKAGES},vim,bash-completion,screen,less,bzip2,acpid
 DEBOOTSTRAP=$(which debootstrap)

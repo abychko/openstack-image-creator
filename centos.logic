@@ -1,5 +1,22 @@
+#
+set -e
+#
+LYNX=$(which lynx)
 RPM=$(which rpm)
+YUM=$(which yum)
+#
 if [ ${ARCH} = amd64 ]; then
 	ARCH=x86_64
 fi
+#
 MIRROR=http://mirror.centos.org/centos-${RELEASE}/${RELEASE}/os/${ARCH}
+#
+installBaseSystem(){
+  echo "* Installing Centos-${RELEASE}-${ARCH} system to ${MOUNTDIR}"
+  mkdir -p ${MOUNTDIR}/var/lib/rpm
+  ${RPM} --rebuilddb --root=${MOUNTDIR}
+  CENTOS_RELEASE_RPM=$(lynx --dump ${MIRROR}/Packages | egrep -o "http.*centos-release-.*rpm")
+  wget ${CENTOS_RELEASE_RPM} -O ${MOUNTDIR}/centos-release-${RELEASE}.rpm
+	${RPM} -i --root=${MOUNTDIR} --nodeps ${MOUNTDIR}/centos-release-${RELEASE}.rpm
+	yum --installroot=$CHROOT install -y rpm-build yum
+}

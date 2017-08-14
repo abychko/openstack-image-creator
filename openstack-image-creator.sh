@@ -140,6 +140,8 @@ mount -o loop /dev/mapper/${LOOP_DEVICE} ${MOUNTDIR}
 ##
 installBaseSystem
 #
+exit 0
+#
 # mount /proc, /dev, /sys
 mount -t proc /proc ${MOUNTDIR}/proc
 mount --rbind /sys ${MOUNTDIR}/sys
