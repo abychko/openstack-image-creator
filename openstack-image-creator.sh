@@ -133,6 +133,8 @@ else
   exit 1
 fi
 #
+# wait until loop device will appear
+sleep 5
 ##
 mkfs.ext4 -O ^64bit /dev/mapper/${LOOP_DEVICE}
 tune2fs -c 0 /dev/mapper/${LOOP_DEVICE}
