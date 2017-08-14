@@ -41,7 +41,7 @@ gpgcheck=1
 plugins=1
 arch=${ARCH}
 basearch=${BASEARCH}
-releasever=${RELEASE}
+distroverpkg=centos-release
 " > ${MOUNTDIR}/etc/yum/yum.conf
 }
 #
@@ -57,6 +57,7 @@ installBaseSystem(){
 	createTempYumConf
 	createImageYumConf
 	${YUM} --config=/tmp/yum.conf --installroot=${MOUNTDIR} install -y rpm yum
+	chroot ${MOUNTDIR} rpm -i --force /centos-release-${RELEASE}.rpm
 	chroot ${MOUNTDIR} yum -y groupinstall base
 	rm -fv /tmp/yum.conf ${MOUNTDIR}/centos-release-${RELEASE}.rpm
 }
