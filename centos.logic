@@ -17,6 +17,7 @@ reposdir=${MOUNTDIR}/etc/yum.repos.d
 exactarch=1
 obsoletes=1
 debuglevel=2
+gpgcheck=0
 	" > ${MOUNTDIR}/yum.conf
 }
 installBaseSystem(){
@@ -26,6 +27,8 @@ installBaseSystem(){
   CENTOS_RELEASE_RPM=$(lynx --dump ${MIRROR}/Packages | egrep -o "http.*centos-release-.*rpm")
   wget ${CENTOS_RELEASE_RPM} -O ${MOUNTDIR}/centos-release-${RELEASE}.rpm
 	${RPM} -i --root=${MOUNTDIR} --nodeps ${MOUNTDIR}/centos-release-${RELEASE}.rpm
+	mkdir -p /etc/pki/rpm-gpg
+	cp -av ${MOUNTDIR}/etc/pki/rpm-gpg/* /etc/pki/rpm-gpg
 	#
 	createTempYumFile
 	#
