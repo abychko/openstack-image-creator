@@ -31,6 +31,7 @@ installBaseSystem(){
 	cp -av ${MOUNTDIR}/etc/pki/rpm-gpg/* /etc/pki/rpm-gpg
 	createTempYumFile
 	${YUM} --config=${MOUNTDIR}/yum.conf --installroot=${MOUNTDIR} install -y rpm yum
-	chroot ${MOUNTDIR} yum groupinstall base
+	cp -av /etc/resolv.conf ${MOUNTDIR}/etc/
+	chroot ${MOUNTDIR} yum -y groupinstall base
 	rm -fv ${MOUNTDIR}/yum.conf ${MOUNTDIR}/centos-release-${RELEASE}.rpm
 }
