@@ -6,12 +6,12 @@ RPM=$(which rpm)
 YUM=$(which yum)
 #
 if [ ${ARCH} = amd64 ]; then
-	ARCH=x86_64
+	mARCH=x86_64
 	BASEARCH=${ARCH}
 fi
 #
 if [ ${ARCH} = i386 ]; then
-	ARCH=i686
+	mARCH=i686
 	BASEARCH=${ARCH}
 fi
 #
@@ -39,7 +39,7 @@ exactarch=1
 obsoletes=1
 gpgcheck=1
 plugins=1
-arch=${ARCH}
+arch=${mARCH}
 basearch=${BASEARCH}
 distroverpkg=centos-release
 " > ${MOUNTDIR}/etc/yum/yum.conf
@@ -54,7 +54,7 @@ installBaseSystem(){
 	${RPM} -i --root=${MOUNTDIR} --nodeps ${MOUNTDIR}/centos-release-${RELEASE}.rpm
 	mkdir -p /etc/pki/rpm-gpg
 	cp -av ${MOUNTDIR}/etc/pki/rpm-gpg/* /etc/pki/rpm-gpg
-	cp -av /etc/resolv.conf ${MOUNTDIR}/etc
+	echo "nameserver 8.8.8.8" > ${MOUNTDIR}/etc/resolv.conf
 	createTempYumConf
 	createImageYumConf
 	${YUM} --config=/tmp/yum.conf --installroot=${MOUNTDIR} install -y rpm yum
