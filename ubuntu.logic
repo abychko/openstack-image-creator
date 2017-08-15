@@ -5,6 +5,7 @@ NEEDED_PACKAGES=sudo,openssh-server,file,kbd,lsof
 PKGLIST=${NEEDED_PACKAGES},vim,bash-completion,screen,less,bzip2,acpid
 DEBOOTSTRAP=$(which debootstrap)
 MIRROR=http://archive.ubuntu.com/ubuntu
+PERCONA_NEEDED="git"
 #
 if [ ${ARCH} = x86_64 ]; then
   ARCH=amd64
@@ -32,6 +33,7 @@ createSourceList(){
 upgradeSystem(){
   chroot ${MOUNTDIR} apt-get update
   chroot ${MOUNTDIR} bash -c "DEBIAN_FRONTEND=noninteractive apt-get -y install euca2ools cloud-init cloud-utils linux-image-virtual extlinux mc cloud-initramfs-growroot"
+  chroot ${MOUNTDIR} apt-get -y install ${PERCONA_NEEDED}
   chroot ${MOUNTDIR} apt-get -y dist-upgrade
   chroot ${MOUNTDIR} apt-get -y autoremove || true
 }

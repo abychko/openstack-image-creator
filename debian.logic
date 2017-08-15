@@ -5,6 +5,7 @@ NEEDED_PACKAGES=sudo,adduser,locales,extlinux,openssh-server,euca2ools,file,kbd,
 PKGLIST=${NEEDED_PACKAGES},vim,mc,bash-completion,screen,less,bzip2,acpid
 DEBOOTSTRAP=$(which debootstrap)
 MIRROR=http://deb.debian.org/debian/
+PERCONA_NEEDED="git"
 #
 if [ ${ARCH} = x86_64 ]; then
   ARCH=amd64
@@ -55,6 +56,7 @@ datasource_list: [ Ec2 ]" > ${MOUNTDIR}/etc/cloud/cloud.cfg.d/90_dpkg.cfg
 #
 upgradeSystem(){
   chroot ${MOUNTDIR} apt-get -y --force-yes install cloud-init cloud-utils cloud-initramfs-growroot
+  chroot ${MOUNTDIR} apt-get -y install ${PERCONA_NEEDED}
   chroot ${MOUNTDIR} apt-get -y dist-upgrade
   chroot ${MOUNTDIR} apt-get -y autoremove || true
 }
