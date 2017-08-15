@@ -228,8 +228,8 @@ echo '
 *
 '
 #
-echo "* Image done - ${OUTDIR}/${QCOW2_IMAGE}"
-echo "* Password for ${QCOW2_IMAGE} is saved to ${OUTDIR}/${FILENAME}.passwd"
+echo "* Image done - $(readlink -f ${OUTDIR}/${QCOW2_IMAGE})"
+echo "* Password for $(readlink -f ${QCOW2_IMAGE} is saved to ${OUTDIR}/${FILENAME}.passwd)"
 #
 echo '
 *

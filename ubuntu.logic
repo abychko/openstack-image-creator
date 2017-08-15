@@ -39,10 +39,6 @@ upgradeSystem(){
 }
 #
 adjustCloudSettings(){
-  #
-  echo "# to update this file, run dpkg-reconfigure cloud-init
-datasource_list: [ Openstack, Ec2 ]" > ${MOUNTDIR}/etc/cloud/cloud.cfg.d/90_dpkg.cfg
-  #
   # Allow SSH in as root, even though it might be unsecure
   sed -i 's/disable_root: true/disable_root: false/' ${MOUNTDIR}/etc/cloud/cloud.cfg
   sed -i "s/name: ubuntu/name: ${CLOUD_USER}/" ${MOUNTDIR}/etc/cloud/cloud.cfg
