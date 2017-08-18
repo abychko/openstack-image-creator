@@ -82,7 +82,7 @@ createRepositories(){
 }
 #
 upgradeSystem(){
-  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install cloud-init cloud-utils-growpart dracut-modules-growroot kernel syslinux-extlinux
+  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install dhclient sudo cloud-init cloud-utils-growpart dracut-modules-growroot kernel syslinux-extlinux
   ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install ${PERCONA_NEEDED}
   ${cmdPREFIX} chroot ${MOUNTDIR} yum -y upgrade
 }
