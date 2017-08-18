@@ -14,7 +14,7 @@ if [ ${ARCH} = i386 ]; then
 fi
 #
 MIRROR=http://mirror.centos.org/centos-${RELEASE}/${RELEASE}/os/${ARCH}
-PERCONA_NEEDED="git mc openssh openssh-server openssh-clients"
+IMAGE_NEEDS="git mc openssh openssh-server openssh-clients"
 #
 createTempYumConf(){
   echo "[main]
@@ -62,7 +62,7 @@ installBaseSystem(){
 configureFSTab(){
 # Setup fstab
   echo "# /etc/fstab: static file system information.
-UUID=${UUID} /                       ext4    defaults,noatime        1 1
+UUID=${UUID} /    ext4    noatime        1 1
 tmpfs                   /dev/shm                tmpfs   defaults        0 0
 devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
 sysfs                   /sys                    sysfs   defaults        0 0
@@ -83,7 +83,8 @@ createRepositories(){
 #
 upgradeSystem(){
   ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install dhclient sudo cloud-init cloud-utils-growpart dracut-modules-growroot kernel syslinux-extlinux
-  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install ${PERCONA_NEEDED}
+  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install selinux-policy selinux-policy-targeted acpid
+  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install ${IMAGE_NEEDS}
   ${cmdPREFIX} chroot ${MOUNTDIR} yum -y upgrade
 }
 #
@@ -109,7 +110,7 @@ configureBoot(){
 timeout 10
 label linux
 kernel /${KERNEL}
-append initrd=/${RAMDISK} root=UUID=${UUID} console=tty0 console=ttyS0,115200 net.ifnames=0" > ${MOUNTDIR}/boot/extlinux/extlinux.conf
+append initrd=/${RAMDISK} root=UUID=${UUID} rootfstype=ext4 console=tty0 console=ttyS0,115200 net.ifnames=0" > ${MOUNTDIR}/boot/extlinux/extlinux.conf
   ${cmdPREFIX} chroot ${MOUNTDIR} dracut -f /boot/initramfs-${kVERSION}.img ${kVERSION}
 }
 #
