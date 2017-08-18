@@ -1,5 +1,5 @@
 #
-set -e
+set -xe
 #
 NEEDED_PACKAGES=sudo,adduser,locales,extlinux,openssh-server,euca2ools,file,kbd,lsof
 PKGLIST=${NEEDED_PACKAGES},vim,mc,bash-completion,screen,less,bzip2,acpid
@@ -31,7 +31,7 @@ setLocale(){
   chroot ${MOUNTDIR} update-locale LANG=en_US.UTF-8
 }
 #
-createSourceList(){
+createRepositories(){
   echo "deb ${MIRROR} ${RELEASE} main contrib non-free" > ${MOUNTDIR}/etc/apt/sources.list
   echo "deb ${MIRROR} ${RELEASE}-updates main contrib non-free" >> ${MOUNTDIR}/etc/apt/sources.list
   echo "deb http://security.debian.org/ ${RELEASE}/updates main contrib non-free" >> ${MOUNTDIR}/etc/apt/sources.list
@@ -57,6 +57,9 @@ datasource_list: [ Ec2 ]" > ${MOUNTDIR}/etc/cloud/cloud.cfg.d/90_dpkg.cfg
 upgradeSystem(){
   chroot ${MOUNTDIR} apt-get -y --force-yes install cloud-init cloud-utils cloud-initramfs-growroot
   chroot ${MOUNTDIR} apt-get -y install ${PERCONA_NEEDED}
+  if [ ${RELEASE} = stretch ]; then
+    chroot ${MOUNTDIR} apt-get -y install dirmngr
+  fi
   chroot ${MOUNTDIR} apt-get -y dist-upgrade
   chroot ${MOUNTDIR} apt-get -y autoremove || true
 }
@@ -135,4 +138,8 @@ setHostname(){
   echo "${DISTRO}.${RELEASE}.openstack" > ${MOUNTDIR}/etc/hostname
 }
 #
-
+createCloudUser(){
+  echo "* adding cloud user ${CLOUD_USER} ..."
+  chroot ${MOUNTDIR} adduser --gecos ${DISTRO}-cloud-user --disabled-password --quiet ${CLOUD_USER}
+}
+#

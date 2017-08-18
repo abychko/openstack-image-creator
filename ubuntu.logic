@@ -1,5 +1,5 @@
 #
-set -e
+set -xe
 #
 NEEDED_PACKAGES=sudo,openssh-server,file,kbd,lsof
 PKGLIST=${NEEDED_PACKAGES},vim,bash-completion,screen,less,bzip2,acpid
@@ -23,7 +23,7 @@ setLocale(){
   chroot ${MOUNTDIR} update-locale LANG=en_US.UTF-8
 }
 #
-createSourceList(){
+createRepositories(){
   echo "deb ${MIRROR} ${RELEASE} main restricted universe multiverse" > ${MOUNTDIR}/etc/apt/sources.list
   echo "deb ${MIRROR} ${RELEASE}-updates main restricted universe multiverse" >> ${MOUNTDIR}/etc/apt/sources.list
   echo "deb ${MIRROR} ${RELEASE}-security main restricted universe multiverse" >> ${MOUNTDIR}/etc/apt/sources.list
@@ -53,7 +53,7 @@ configureFSTab(){
 # Setup fstab
   echo "# /etc/fstab: static file system information.
 proc  /proc  proc  nodev,noexec,nosuid  0  0
-/dev/vda1  /  ext4  errors=remount-ro  0  1
+UUID=${UUID}  /  ext4  errors=remount-ro  0  1
 " > ${MOUNTDIR}/etc/fstab
 }
 #
@@ -62,7 +62,6 @@ configureBoot(){
   chroot ${MOUNTDIR} update-initramfs -u
   KERNEL=`chroot ${MOUNTDIR} find boot -name 'vmlinuz-*'`
   RAMDISK=`chroot ${MOUNTDIR} find boot -name 'initrd.img-*'`
-  UUID=`blkid -o value -s UUID /dev/mapper/${LOOP_DEVICE}`
   mkdir -p ${MOUNTDIR}/boot/extlinux
   extlinux --install ${MOUNTDIR}/boot/extlinux
   chroot ${MOUNTDIR} ln -snf . /boot/boot
@@ -70,8 +69,9 @@ configureBoot(){
 timeout 10
 label linux
 kernel /${KERNEL}
-append initrd=/${RAMDISK} root=/dev/vda1 console=tty0 console=ttyS0,115200 net.ifnames=0 ro" > ${MOUNTDIR}/boot/extlinux/extlinux.conf
+append initrd=/${RAMDISK} root=UUID=${UUID} console=tty0 console=ttyS0,115200 net.ifnames=0 ro" > ${MOUNTDIR}/boot/extlinux/extlinux.conf
 }
+#
 configureNetwork(){
   echo "# This file describes the network interfaces available on your system
 # and how to activate them. For more information, see interfaces(5).
@@ -96,10 +96,13 @@ pci_hotplug
 }
 #
 cleanupSystem(){
+  echo "* removing SSH keys ..."
   rm -f ${MOUNTDIR}/etc/ssh/ssh_host_*
-  rm -f ${MOUNTDIR}/etc/udev/rules.d/70-persistent-net.rules
+  echo "* removing UDEV persistent net rules ..."
+  rm -f ${MOUNTDIR}/etc/udev/rules.d/*-persistent-net.rules
   rm -f ${MOUNTDIR}/lib/udev/write_net_rules
-  rm -fv ${MOUNTDIR}/var/cache/apt/archives/*.deb
+  echo "* cleaning downloaded APT archives ..."
+  rm -f ${MOUNTDIR}/var/cache/apt/archives/*.deb
 }
 #
 setupConsole(){
@@ -119,5 +122,10 @@ TTYVTDisallocate=no' > ${MOUNTDIR}/etc/systemd/system/getty@tty1.service.d/nocle
 #
 setHostname(){
   echo "${DISTRO}.${RELEASE}.openstack" > ${MOUNTDIR}/etc/hostname
+}
+#
+createCloudUser(){
+  echo "* adding cloud user ${CLOUD_USER} ..."
+  chroot ${MOUNTDIR} adduser --gecos ${DISTRO}-cloud-user --disabled-password --quiet ${CLOUD_USER}
 }
 #

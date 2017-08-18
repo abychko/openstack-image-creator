@@ -1,22 +1,23 @@
 #
-set -e
+set -xe
 #
 LYNX=$(which lynx)
 RPM=$(which rpm)
 YUM=$(which yum)
 #
 if [ ${ARCH} = amd64 ]; then
-	ARCH=x86_64
+  ARCH=x86_64
 fi
 #
 if [ ${ARCH} = i386 ]; then
-	cmdPREFIX="setarch ${ARCH}"
+  cmdPREFIX="setarch ${ARCH}"
 fi
 #
 MIRROR=http://mirror.centos.org/centos-${RELEASE}/${RELEASE}/os/${ARCH}
+PERCONA_NEEDED="git mc openssh openssh-server openssh-clients"
 #
 createTempYumConf(){
-	echo "[main]
+  echo "[main]
 reposdir=${MOUNTDIR}/etc/yum.repos.d
 exactarch=0
 obsoletes=1
@@ -26,9 +27,9 @@ gpgcheck=0
 }
 #
 createImageYumConf(){
-	mkdir -p ${MOUNTDIR}/etc/yum
-	echo "[main]
-cachedir=/var/cache/yum/${BASEARCH}/${RELEASE}'
+  mkdir -p ${MOUNTDIR}/etc/yum
+  echo "[main]
+cachedir=/var/cache/yum/${BASEARCH}/${RELEASE}
 keepcache=0
 debuglevel=2
 logfile=/var/log/yum.log
@@ -46,14 +47,154 @@ installBaseSystem(){
   ${RPM} --rebuilddb --root=${MOUNTDIR}
   CENTOS_RELEASE_RPM=$(lynx --dump ${MIRROR}/Packages | egrep -o "http.*centos-release-.*rpm")
   wget ${CENTOS_RELEASE_RPM} -O ${MOUNTDIR}/centos-release-${RELEASE}.rpm
-	${RPM} -i --root=${MOUNTDIR} --nodeps ${MOUNTDIR}/centos-release-${RELEASE}.rpm
-	mkdir -p /etc/pki/rpm-gpg
-	cp -av ${MOUNTDIR}/etc/pki/rpm-gpg/* /etc/pki/rpm-gpg
-	echo "nameserver 8.8.8.8" > ${MOUNTDIR}/etc/resolv.conf
-	createTempYumConf
-	createImageYumConf
-	${cmdPREFIX} ${YUM} --config=/tmp/yum.conf --installroot=${MOUNTDIR} install -y rpm yum
-	chroot ${MOUNTDIR} rpm -i --force /centos-release-${RELEASE}.rpm
-	${cmdPREFIX} chroot ${MOUNTDIR} yum -y groupinstall base
-	rm -fv /tmp/yum.conf ${MOUNTDIR}/centos-release-${RELEASE}.rpm
+  ${RPM} -i --root=${MOUNTDIR} --nodeps ${MOUNTDIR}/centos-release-${RELEASE}.rpm
+  mkdir -p /etc/pki/rpm-gpg
+  cp -av ${MOUNTDIR}/etc/pki/rpm-gpg/* /etc/pki/rpm-gpg
+  echo "nameserver 8.8.8.8" > ${MOUNTDIR}/etc/resolv.conf
+  createTempYumConf
+  createImageYumConf
+  ${cmdPREFIX} ${YUM} --config=/tmp/yum.conf --installroot=${MOUNTDIR} install -y rpm yum
+  chroot ${MOUNTDIR} rpm -i --force /centos-release-${RELEASE}.rpm
+  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y groupinstall base
+  rm -fv /tmp/yum.conf ${MOUNTDIR}/centos-release-${RELEASE}.rpm
 }
+#
+configureFSTab(){
+# Setup fstab
+  echo "# /etc/fstab: static file system information.
+UUID=${UUID} /                       ext4    defaults,noatime        1 1
+tmpfs                   /dev/shm                tmpfs   defaults        0 0
+devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
+sysfs                   /sys                    sysfs   defaults        0 0
+proc                    /proc                   proc    defaults        0 0
+" > ${MOUNTDIR}/etc/fstab
+}
+#
+setLocale(){
+  # set locale
+  echo "LANG=en_US.UTF-8" > ${MOUNTDIR}/etc/sysconfig/i18n
+  echo "SYSFONT=latarcyrheb-sun16" >> ${MOUNTDIR}/etc/sysconfig/i18n
+}
+#
+createRepositories(){
+#install EPEL repo
+  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-${RELEASE}.noarch.rpm
+}
+#
+upgradeSystem(){
+  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install cloud-init cloud-utils-growpart dracut-modules-growroot kernel syslinux-extlinux
+  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install ${PERCONA_NEEDED}
+  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y upgrade
+}
+#
+adjustCloudSettings(){
+#Allow SSH in as root, even though it might be unsecure
+  sed -i 's/disable_root: true/disable_root: false/' ${MOUNTDIR}/etc/cloud/cloud.cfg
+  sed -i "s/name: centos/name: ${CLOUD_USER}/" ${MOUNTDIR}/etc/cloud/cloud.cfg
+#Since we implemented backdoor we want to be able to use it :)
+  sed -i 's/PermitRootLogin yes/PermitRootLogin without-password/' ${MOUNTDIR}/etc/ssh/sshd_config
+# copy SKEL to root userdir
+  cp -v ${MOUNTDIR}/etc/skel/.b* ${MOUNTDIR}/root/
+#set timezone
+  cp ${MOUNTDIR}/usr/share/zoneinfo/America/New_York ${MOUNTDIR}/etc/localtime
+}
+configureBoot(){
+  KERNEL=$(chroot ${MOUNTDIR} find boot -name 'vmlinuz-*')
+  RAMDISK=$(chroot ${MOUNTDIR} find boot -name 'initramfs-*.img')
+  kVERSION=$(echo ${RAMDISK%.img} | awk -F'-' '{print $2"-"$3}')
+  mkdir -p ${MOUNTDIR}/boot/extlinux
+  extlinux --install ${MOUNTDIR}/boot/extlinux
+  chroot ${MOUNTDIR} ln -snf . /boot/boot
+  echo "default linux
+timeout 10
+label linux
+kernel /${KERNEL}
+append initrd=/${RAMDISK} root=UUID=${UUID} console=tty0 console=ttyS0,115200 net.ifnames=0" > ${MOUNTDIR}/boot/extlinux/extlinux.conf
+  ${cmdPREFIX} chroot ${MOUNTDIR} dracut -f /boot/initramfs-${kVERSION}.img ${kVERSION}
+}
+#
+configureNetwork(){
+  echo "
+DEVICE=eth0
+TYPE=Ethernet
+BOOTPROTO=dhcp
+ONBOOT=yes
+" > ${MOUNTDIR}/etc/sysconfig/network-scripts/ifcfg-eth0
+}
+#
+cleanupSystem(){
+  echo "* removing SSH keys ..."
+  rm -f ${MOUNTDIR}/etc/ssh/ssh_host_*
+  echo "* removing UDEV persistent net rules ..."
+  rm -f ${MOUNTDIR}/etc/udev/rules.d/*-persistent-net.rules
+  rm -f ${MOUNTDIR}/lib*/udev/write_net_rules
+  echo "* cleaning downloaded YUM data and packages ..."
+  ${cmdPREFIX} chroot ${MOUNTDIR} yum clean all
+}
+#
+setupConsole(){
+  echo "Setting up console params ..."
+}
+#
+configureModules(){
+  echo "#
+blacklist i8xx_tco
+blacklist aty128fb
+blacklist atyfb
+blacklist radeonfb
+blacklist i810fb
+blacklist cirrusfb
+blacklist intelfb
+blacklist kyrofb
+blacklist i2c-matroxfb
+blacklist hgafb
+blacklist nvidiafb
+blacklist rivafb
+blacklist savagefb
+blacklist sstfb
+blacklist neofb
+blacklist tridentfb
+blacklist tdfxfb
+blacklist virgefb
+blacklist vga16fb
+blacklist viafb
+blacklist hisax
+blacklist hisax_fcpcipnp
+blacklist snd-pcsp
+blacklist chsc_sch
+" > ${MOUNTDIR}/etc/modprobe.d/blacklist.conf
+#
+  echo "# Required for cinder hotplug
+acpiphp
+pci_hotplug
+" >> ${MOUNTDIR}/etc/modules
+}
+#
+setHostname(){
+  echo "NETWORKING=yes" > ${MOUNTDIR}/etc/sysconfig/network
+  echo "HOSTNAME=${DISTRO}.${RELEASE}.openstack" >> ${MOUNTDIR}/etc/sysconfig/network
+}
+#
+createCloudUser(){
+  echo "* adding cloud user ${CLOUD_USER} ..."
+  ${cmdPREFIX} chroot ${MOUNTDIR} adduser --create-home --shell /bin/bash --user-group --comment ${DISTRO}-cloud-user ${CLOUD_USER}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
