@@ -6,7 +6,10 @@ Usage: $0 --distro <distro> --arch <arch> --release <release>
 Where required are:
   <distro> is centos|debian|ubuntu
   <arch> is i386|(amd64|x86_64)
-  <release> is depends on <distro>. it may be 6|7 for centos, wheezy|jessie|stretch for debian and trusty|xenial|yakkety|zesty for ubuntu
+  <release> is depends on <distro>. it may be:
+    => 6 | 7 for centos,
+    => wheezy | jessie | stretch for debian
+    => trusty | xenial | zesty | artful  for ubuntu
 
 Additional params, not required:
   --imagesize <size>, default is 2G, for minimal image
@@ -232,7 +235,7 @@ echo '
 '
 #
 echo "* Image done - $(readlink -f ${OUTDIR}/${QCOW2_IMAGE})"
-echo "* Password for $(readlink -f ${QCOW2_IMAGE}) is saved to ${OUTDIR}/${FILENAME}.passwd"
+echo "* Password for $(readlink -f ${OUTDIR}/${QCOW2_IMAGE}) is saved to ${OUTDIR}/${FILENAME}.passwd"
 #
 echo '
 *

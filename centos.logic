@@ -1,5 +1,5 @@
 #
-set -xe
+set -e
 #
 LYNX=$(which lynx)
 RPM=$(which rpm)
@@ -86,6 +86,7 @@ upgradeSystem(){
   ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install selinux-policy selinux-policy-targeted acpid
   ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install ${IMAGE_NEEDS}
   ${cmdPREFIX} chroot ${MOUNTDIR} yum -y upgrade
+  ${cmdPREFIX} chroot ${MOUNTDIR} sed -i 's:SELINUX=enforcing:SELINUX=permissive:g' /etc/selinux/config
 }
 #
 adjustCloudSettings(){
@@ -111,7 +112,7 @@ timeout 10
 label linux
 kernel /${KERNEL}
 append initrd=/${RAMDISK} root=UUID=${UUID} rootfstype=ext4 console=tty0 console=ttyS0,115200 net.ifnames=0" > ${MOUNTDIR}/boot/extlinux/extlinux.conf
-  ${cmdPREFIX} chroot ${MOUNTDIR} dracut -f /boot/initramfs-${kVERSION}.img ${kVERSION}
+  ${cmdPREFIX} chroot ${MOUNTDIR} dracut --add-drivers "virtio_pci virtio_blk virtio_scsi virtio_net virtio_ring virtio" -v -f /boot/initramfs-${kVERSION}.img ${kVERSION}
 }
 #
 configureNetwork(){
@@ -164,6 +165,7 @@ blacklist hisax_fcpcipnp
 blacklist snd-pcsp
 blacklist chsc_sch
 " > ${MOUNTDIR}/etc/modprobe.d/blacklist.conf
+
 #
   echo "# Required for cinder hotplug
 acpiphp
@@ -180,22 +182,3 @@ createCloudUser(){
   echo "* adding cloud user ${CLOUD_USER} ..."
   ${cmdPREFIX} chroot ${MOUNTDIR} adduser --create-home --shell /bin/bash --user-group --comment ${DISTRO}-cloud-user ${CLOUD_USER}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

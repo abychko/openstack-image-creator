@@ -1,5 +1,5 @@
 #
-set -xe
+set -e
 #
 NEEDED_PACKAGES=sudo,adduser,locales,extlinux,openssh-server,euca2ools,file,kbd,lsof
 PKGLIST=${NEEDED_PACKAGES},vim,mc,bash-completion,screen,less,bzip2,acpid
