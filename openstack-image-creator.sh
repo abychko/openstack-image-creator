@@ -150,6 +150,8 @@ mount --rbind /sys ${MOUNTDIR}/sys
 mount --make-rslave ${MOUNTDIR}/sys
 mount --rbind /dev ${MOUNTDIR}/dev
 mount --make-rslave ${MOUNTDIR}/dev
+#
+chroot ${MOUNTDIR} rm -f /etc/mtab
 chroot ${MOUNTDIR} ln -s /proc/mounts /etc/mtab
 #
 configureFSTab
