@@ -94,7 +94,7 @@ done
 #
 PARTED=$(which parted)
 KPARTX=$(which kpartx)
-FILENAME=${DISTRO}-${RELEASE}-${ARCH}_${DATE}
+FILENAME=${DISTRO}-${RELEASE}-${ARCH}-${DATE}
 RAW_IMAGE=${FILENAME}.raw
 QCOW2_IMAGE=${FILENAME}.qcow2
 PASSWD_FILE=${FILENAME}.passwd
