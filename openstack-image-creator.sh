@@ -214,6 +214,10 @@ rmdir ${MOUNTDIR}
 # Run FSCK
 echo "* running fsck on /dev/mapper/${LOOP_DEVICE} ..."
 fsck.ext4 -f -y /dev/mapper/${LOOP_DEVICE} || true
+#
+echo "* Sleeping a bit..."
+sleep 10
+#
 echo "* detaching ${RAW_IMAGE} ..."
 kpartx -dv ${RAW_IMAGE}
 #
