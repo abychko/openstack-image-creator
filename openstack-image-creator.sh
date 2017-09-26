@@ -205,6 +205,9 @@ for DIR in $(mount | grep ${MOUNTDIR} | tac | awk '{print $3}'); do
   umount ${DIR}
 done
 #
+echo "* Sleeping a bit..."
+sleep 10
+#
 echo "* removing temp installation directory ..."
 rmdir ${MOUNTDIR}
 #
