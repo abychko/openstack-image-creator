@@ -9,9 +9,10 @@ Shell script to create images for OpenStack, inspired by https://github.com/mare
 * $
 
 # Build Debian images
-```for _release in wheezy jessie stretch; do
-	for _arch in i386 amd64; do
-		sudo bash -x ./openstack-image-creator.sh --distro debian --arch ${_arch} --release ${_release} --remove-raw --outdir IMAGES
-	done
+```
+for _release in wheezy jessie stretch; do
+  for _arch in i386 amd64; do
+    sudo bash -x ./openstack-image-creator.sh --distro debian --arch ${_arch} --release ${_release} --remove-raw --outdir IMAGES
+  done
 done
 ```
