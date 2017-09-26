@@ -10,8 +10,8 @@ $ sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--for
 $
 
 # Build Debian images
-for _release in wheezy jessie stretch; do
+`for _release in wheezy jessie stretch; do
 	for _arch in i386 amd64; do
 		sudo bash -x ./openstack-image-creator.sh --distro debian --arch ${_arch} --release ${_release} --remove-raw --outdir IMAGES
 	done
-done
+done`
