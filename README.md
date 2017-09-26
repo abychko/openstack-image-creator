@@ -25,8 +25,8 @@ done
 # Example, build Ubuntu images
 ```
 for _release in trusty xenial yakkety zesty artful; do
-	for _arch in i386 amd64; do
-		sudo bash -x ./openstack-image-creator.sh --distro ubuntu --arch ${_arch} --release ${_release} --remove-raw --outdir IMAGES
-	done
+  for _arch in i386 amd64; do
+    sudo bash -x ./openstack-image-creator.sh --distro ubuntu --arch ${_arch} --release ${_release} --remove-raw --outdir IMAGES
+  done
 done
 ```
