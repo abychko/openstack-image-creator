@@ -32,7 +32,7 @@ fi
 #
 cd $(readlink -f $(dirname $0))
 #
-DATE=$(date +%s)
+DATE=$(date +%Y%m%d)
 DISTRO=debian
 ARCH=amd64
 RELEASE=jessie
