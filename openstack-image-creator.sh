@@ -50,6 +50,9 @@ CLOUD_USER=jenkins
 #
 # JRE-related. You need to export your server address
 # including download location before the build
+if [ -f script-params ]; then
+  . script-params
+fi
 #
 JRE=no
 #
