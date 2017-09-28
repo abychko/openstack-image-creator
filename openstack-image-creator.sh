@@ -48,28 +48,6 @@ REMOVE_RAW=no
 INTERACTIVE=no
 CLOUD_USER=jenkins
 #
-# JRE-related. You need to export your server address
-# including download location before the build
-if [ -f script-params ]; then
-  . script-params
-fi
-#
-JRE=no
-#
-if [ -z "${JRE_DOWNLOAD_SERVER}" ]; then
-  JRE_DOWNLOAD_SERVER="https://java.com" # ;)
-fi
-#
-if [ -z ${JRE_VERSION} ]; then
-  JRE_VERSION="8u144"
-fi
-#
-if [ -z ${JRE_DIRNAME} ]; then
-  JRE_DIRNAME="jre1.8.0_144"
-fi
-#
-JRE_TARBALL="jre-${JRE_VERSION}-linux-${ARCH}.tar.gz"
-#
 # Trying to parse the options passed to script
 while [ $# -gt 0 ]; do
   case $1 in
@@ -120,6 +98,28 @@ while [ $# -gt 0 ]; do
       ;;
   esac
 done
+#
+# JRE-related. You need to export your server address
+# including download location before the build
+if [ -f script-params ]; then
+  . script-params
+fi
+#
+JRE=no
+#
+if [ -z "${JRE_DOWNLOAD_SERVER}" ]; then
+  JRE_DOWNLOAD_SERVER="https://java.com" # ;)
+fi
+#
+if [ -z ${JRE_VERSION} ]; then
+  JRE_VERSION="8u144"
+fi
+#
+if [ -z ${JRE_DIRNAME} ]; then
+  JRE_DIRNAME="jre1.8.0_144"
+fi
+#
+JRE_TARBALL="jre-${JRE_VERSION}-linux-${ARCH}.tar.gz"
 #
 PARTED=$(which parted)
 KPARTX=$(which kpartx)
