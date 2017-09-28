@@ -37,6 +37,7 @@ DATE=$(date +%Y%m%d)
 DISTRO=debian
 ARCH=amd64
 RELEASE=jessie
+JRE=no
 IMAGESIZE=2 #G
 EXTLINUX=$(which extlinux)
 PWGEN=$(which pwgen)
@@ -104,8 +105,6 @@ done
 if [ -f script-params ]; then
   . script-params
 fi
-#
-JRE=no
 #
 if [ -z "${JRE_DOWNLOAD_SERVER}" ]; then
   JRE_DOWNLOAD_SERVER="https://java.com" # ;)
