@@ -222,6 +222,7 @@ echo "* adding sudoers file for ${CLOUD_USER}..."
 mkdir -p ${MOUNTDIR}/etc/sudoers.d
 echo "${CLOUD_USER} ALL = NOPASSWD: ALL" > ${MOUNTDIR}/etc/sudoers.d/${CLOUD_USER}-cloud-init
 chmod 0440 ${MOUNTDIR}/etc/sudoers.d/${CLOUD_USER}-cloud-init
+chroot ${MOUNTDIR} chown -R ${CLOUD_USER} /home/${CLOUD_USER}
 #
 # Fill up free space with zeroes
 echo "* filling up the free image space with zeroes ..."
