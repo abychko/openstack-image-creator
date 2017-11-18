@@ -111,11 +111,11 @@ if [ -z "${JRE_DOWNLOAD_SERVER}" ]; then
 fi
 #
 if [ -z ${JRE_VERSION} ]; then
-  JRE_VERSION="8u144"
+  JRE_VERSION="8u152"
 fi
 #
 if [ -z ${JRE_DIRNAME} ]; then
-  JRE_DIRNAME="jre1.8.0_144"
+  JRE_DIRNAME="jre1.8.0_152"
 fi
 #
 JRE_TARBALL="jre-${JRE_VERSION}-linux-${ARCH}.tar.gz"
