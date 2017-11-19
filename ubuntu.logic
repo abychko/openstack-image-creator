@@ -2,7 +2,7 @@
 set -e
 #
 NEEDED_PACKAGES=sudo,openssh-server,file,kbd,lsof
-PKGLIST=${NEEDED_PACKAGES},vim,bash-completion,screen,less,bzip2,acpid
+PKGLIST=${NEEDED_PACKAGES},vim,bash-completion,screen,less,bzip2,acpid,net-tools
 DEBOOTSTRAP=$(which debootstrap)
 MIRROR=http://archive.ubuntu.com/ubuntu
 IMAGE_NEEDS="git"
