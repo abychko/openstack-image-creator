@@ -138,7 +138,7 @@ PASSWD_FILE=${FILENAME}.passwd
 MOUNTDIR=$(mktemp -d -t ${FILENAME}.XXXXXX)
 #
 if [ -z "${OUTDIR}" ]; then
-  OUTDIR=IMAGES/${DATE}/${DISTRO}/${ARCH}
+  OUTDIR=IMAGES/${DATE}
 fi
 #
 . $(dirname $0)/${DISTRO}.logic
