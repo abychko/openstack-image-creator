@@ -182,3 +182,4 @@ createCloudUser(){
   echo "* adding cloud user ${CLOUD_USER} ..."
   ${cmdPREFIX} chroot ${MOUNTDIR} adduser --create-home --shell /bin/bash --user-group --comment ${DISTRO}-cloud-user ${CLOUD_USER}
 }
+#

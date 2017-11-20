@@ -84,6 +84,9 @@ iface lo inet loopback
 auto eth0
 iface eth0 inet dhcp
 " > ${MOUNTDIR}/etc/network/interfaces
+  if [ ${RELEASE} = artful ]; then
+    chroot ${MOUNTDIR} systemctl enable systemd-networkd
+  fi
 }
 #
 configureModules(){
