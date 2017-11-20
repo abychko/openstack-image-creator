@@ -48,15 +48,7 @@ ROOT_PASSWORD=$(pwgen -s 14 1)
 REMOVE_RAW=no
 INTERACTIVE=no
 CLOUD_USER=jenkins
-LIMITS=/etc/security/limits.d/99-${CLOUD_USER}.conf
 #
-configureLimits(){
-  echo '* Setting global limits...'
-  echo "${CLOUD_USER} soft nproc  65535" >> ${LIMITS}
-  echo "${CLOUD_USER} hard nproc  65535" >> ${LIMITS}
-  echo "${CLOUD_USER} soft nofile 65535" >> ${LIMITS}
-  echo "${CLOUD_USER} hard nofile 65535" >> ${LIMITS}
-}
 #
 # Trying to parse the options passed to script
 while [ $# -gt 0 ]; do
@@ -136,6 +128,15 @@ RAW_IMAGE=${FILENAME}.raw
 QCOW2_IMAGE=${FILENAME}.qcow2
 PASSWD_FILE=${FILENAME}.passwd
 MOUNTDIR=$(mktemp -d -t ${FILENAME}.XXXXXX)
+LIMITS=${MOUNTDIR}/etc/security/limits.d/99-${CLOUD_USER}.conf
+#
+configureLimits(){
+  echo '* Setting global limits...'
+  echo "${CLOUD_USER} soft nproc  65535" >> ${LIMITS}
+  echo "${CLOUD_USER} hard nproc  65535" >> ${LIMITS}
+  echo "${CLOUD_USER} soft nofile 65535" >> ${LIMITS}
+  echo "${CLOUD_USER} hard nofile 65535" >> ${LIMITS}
+}
 #
 if [ -z "${OUTDIR}" ]; then
   OUTDIR=IMAGES/${DATE}
