@@ -14,7 +14,7 @@ if [ ${ARCH} = i386 ]; then
 fi
 #
 MIRROR=http://mirror.centos.org/centos-${RELEASE}/${RELEASE}/os/${ARCH}
-IMAGE_NEEDS="git mc openssh openssh-server openssh-clients"
+IMAGE_NEEDS="git mc openssh openssh-server openssh-clients gcc gcc-c++ make cmake"
 #
 createTempYumConf(){
   echo "[main]
@@ -79,6 +79,11 @@ setLocale(){
 createRepositories(){
 #install EPEL repo
   ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-${RELEASE}.noarch.rpm
+  if [ ${RELEASE} -eq 6 ]; then
+    pushd ${MOUNTDIR}/etc/yum.repos.d
+    wget http://jenkins.percona.com/yum-repo/percona-dev.repo
+    popd
+  fi
 }
 #
 upgradeSystem(){

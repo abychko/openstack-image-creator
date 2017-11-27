@@ -2,10 +2,10 @@
 set -e
 #
 NEEDED_PACKAGES=sudo,adduser,locales,extlinux,openssh-server,euca2ools,file,kbd,lsof
-PKGLIST=${NEEDED_PACKAGES},vim,mc,bash-completion,screen,less,bzip2,acpid
+PKGLIST=${NEEDED_PACKAGES},bash-completion,less,bzip2,acpid,net-tools
 DEBOOTSTRAP=$(which debootstrap)
 MIRROR=http://deb.debian.org/debian/
-IMAGE_NEEDS="git"
+IMAGE_NEEDS="git vim mc gcc g++ make cmake"
 #
 if [ ${ARCH} = x86_64 ]; then
   ARCH=amd64
