@@ -1,7 +1,7 @@
 #
 set -e
 #
-NEEDED_PACKAGES=sudo,adduser,locales,extlinux,openssh-server,euca2ools,file,kbd,lsof
+NEEDED_PACKAGES=sudo,adduser,locales,openssh-server,euca2ools,file,kbd,lsof
 PKGLIST=${NEEDED_PACKAGES},bash-completion,less,bzip2,acpid,net-tools
 DEBOOTSTRAP=$(which debootstrap)
 MIRROR=http://deb.debian.org/debian/
@@ -55,7 +55,7 @@ datasource_list: [ Ec2 ]" > ${MOUNTDIR}/etc/cloud/cloud.cfg.d/90_dpkg.cfg
 }
 #
 upgradeSystem(){
-  chroot ${MOUNTDIR} apt-get -y --force-yes install cloud-init cloud-utils cloud-initramfs-growroot
+  chroot ${MOUNTDIR} apt-get -y --force-yes install extlinux cloud-init cloud-utils cloud-initramfs-growroot
   chroot ${MOUNTDIR} apt-get -y install ${IMAGE_NEEDS}
   if [ ${RELEASE} = stretch ]; then
     chroot ${MOUNTDIR} apt-get -y install dirmngr
