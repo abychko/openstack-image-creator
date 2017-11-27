@@ -121,6 +121,10 @@ fi
 #
 JRE_TARBALL="jre-${JRE_VERSION}-linux-${ARCH}.tar.gz"
 #
+if [ -n ${http_proxy} ]; then
+  export http_proxy
+fi
+#
 PARTED=$(which parted)
 KPARTX=$(which kpartx)
 FILENAME=${DISTRO}-${RELEASE}-${ARCH}-${DATE}
