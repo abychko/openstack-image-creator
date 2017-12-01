@@ -138,8 +138,8 @@ configureLimits(){
   echo '* Setting global limits...'
   echo "${CLOUD_USER} soft nproc  65535" >> ${LIMITS}
   echo "${CLOUD_USER} hard nproc  65535" >> ${LIMITS}
-  echo "${CLOUD_USER} soft nofile 65535" >> ${LIMITS}
-  echo "${CLOUD_USER} hard nofile 65535" >> ${LIMITS}
+  echo "${CLOUD_USER} soft nofile 1048576" >> ${LIMITS}
+  echo "${CLOUD_USER} hard nofile 1048576" >> ${LIMITS}
 }
 #
 if [ -z "${OUTDIR}" ]; then
