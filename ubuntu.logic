@@ -28,10 +28,11 @@ createRepositories(){
   echo "deb ${MIRROR} ${RELEASE}-updates main restricted universe multiverse" >> ${MOUNTDIR}/etc/apt/sources.list
   echo "deb ${MIRROR} ${RELEASE}-security main restricted universe multiverse" >> ${MOUNTDIR}/etc/apt/sources.list
   echo "deb ${MIRROR} ${RELEASE}-backports main restricted universe multiverse" >> ${MOUNTDIR}/etc/apt/sources.list
+  chroot ${MOUNTDIR} apt-get update
 }
 #
 upgradeSystem(){
-  chroot ${MOUNTDIR} apt-get update
+  chroot ${MOUNTDIR} apt-get -y install apt-transport-https || true
   chroot ${MOUNTDIR} bash -c "DEBIAN_FRONTEND=noninteractive apt-get -y install extlinux cloud-init cloud-utils linux-image-virtual cloud-initramfs-growroot"
   chroot ${MOUNTDIR} apt-get -y install ${IMAGE_NEEDS}
   chroot ${MOUNTDIR} apt-get -y dist-upgrade
