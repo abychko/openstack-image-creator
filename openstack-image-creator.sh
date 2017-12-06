@@ -133,6 +133,7 @@ QCOW2_IMAGE=${FILENAME}.qcow2
 PASSWD_FILE=${FILENAME}.passwd
 MOUNTDIR=$(mktemp -d -t ${FILENAME}.XXXXXX)
 LIMITS=${MOUNTDIR}/etc/security/limits.d/99-${CLOUD_USER}.conf
+SYSCTLVM=${MOUNTDIR}/etc/sysctl.d/99-vm-tuning.conf
 #
 configureLimits(){
   echo '* Setting global limits...'
@@ -140,6 +141,10 @@ configureLimits(){
   echo "${CLOUD_USER} hard nproc  65535" >> ${LIMITS}
   echo "${CLOUD_USER} soft nofile 1048576" >> ${LIMITS}
   echo "${CLOUD_USER} hard nofile 1048576" >> ${LIMITS}
+  #
+  echo 'vm.dirty_ratio = 6'             >> ${SYSCTLVM}
+  echo 'vm.dirty_background_ratio = 3'  >> ${SYSCTLVM}
+  echo 'vm.vfs_cache_pressure = 50'     >> ${SYSCTLVM}
 }
 #
 if [ -z "${OUTDIR}" ]; then
