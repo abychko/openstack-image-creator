@@ -96,6 +96,7 @@ while [ $# -gt 0 ]; do
       ;;
     --no-rebuild )
       export REBUILD=no
+      shift
       ;;
     *)
       echo "* Wrong param or value: $1"
