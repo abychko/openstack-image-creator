@@ -107,6 +107,7 @@ cleanupSystem(){
   rm -f ${MOUNTDIR}/lib/udev/write_net_rules
   echo "* cleaning downloaded APT archives ..."
   rm -f ${MOUNTDIR}/var/cache/apt/archives/*.deb
+  sed -i 's:1:0:g' ${MOUNTDIR}/etc/apt/apt.conf.d/20auto-upgrades
 }
 #
 setupConsole(){
