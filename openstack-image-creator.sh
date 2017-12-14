@@ -47,6 +47,7 @@ WGET=$(which wget)
 ROOT_PASSWORD=$(pwgen -s 14 1)
 REMOVE_RAW=no
 INTERACTIVE=no
+REBUILD=yes
 CLOUD_USER=jenkins
 #
 #
@@ -92,6 +93,9 @@ while [ $# -gt 0 ]; do
     --with-jre )
       export JRE=yes
       shift
+      ;;
+    --no-rebuild )
+      export REBUILD=no
       ;;
     *)
       echo "* Wrong param or value: $1"
@@ -151,6 +155,13 @@ if [ -z "${OUTDIR}" ]; then
   OUTDIR=IMAGES/${DATE}
 fi
 #
+if [ ${REBUILD} = no ]; then
+  if [ -f ${OUTDIR}/${QCOW2_IMAGE} ]; then
+    echo "* Image is built already, exiting"
+    exit 0
+  fi
+fi
+#
 . $(dirname $0)/${DISTRO}.logic
 #
 cleanup(){
@@ -169,7 +180,7 @@ trap "cleanup" EXIT TERM INT
 ### Prepare the HDD (format, ext.) ###
 ######################################
 #
-rm -fv ${RAW_IMAGE} ${QCOW2_IMAGE}
+rm -fv ${RAW_IMAGE} ${OUTDIR}/${QCOW2_IMAGE}
 #
 ${QEMU_IMG} create -f raw ${RAW_IMAGE} ${IMAGESIZE}G
 ${PARTED} -s ${RAW_IMAGE} mklabel msdos
