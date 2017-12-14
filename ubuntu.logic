@@ -5,7 +5,7 @@ NEEDED_PACKAGES=sudo,openssh-server,file,kbd,lsof
 PKGLIST=${NEEDED_PACKAGES},bash-completion,less,bzip2,acpid,net-tools
 DEBOOTSTRAP=$(which debootstrap)
 MIRROR=http://archive.ubuntu.com/ubuntu
-IMAGE_NEEDS="git vim mc gcc g++ make cmake euca2ools"
+IMAGE_NEEDS="git vim language-pack-en gcc g++ make euca2ools"
 #
 if [ ${ARCH} = x86_64 ]; then
   ARCH=amd64
