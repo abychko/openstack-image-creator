@@ -86,9 +86,6 @@ iface lo inet loopback
 auto eth0
 iface eth0 inet dhcp
 " > ${MOUNTDIR}/etc/network/interfaces
-  if [ ${RELEASE} = artful ]; then
-    chroot ${MOUNTDIR} systemctl enable systemd-networkd
-  fi
 }
 #
 configureModules(){
@@ -130,9 +127,12 @@ TTYVTDisallocate=no' > ${MOUNTDIR}/etc/systemd/system/getty@tty1.service.d/nocle
 #
 setHostname(){
   echo "${DISTRO}.${RELEASE}.openstack" > ${MOUNTDIR}/etc/hostname
-  rm -fv ${MOUNTDIR}/etc/resolv.conf
-  echo "# Created by OpenStack Image Creator at ${DATE}" > ${MOUNTDIR}/etc/resolv.conf
-  chroot ${MOUNTDIR} apt-get -y install policykit-1
+  if [ ${RELEASE} = artful ]; then
+    chroot ${MOUNTDIR} systemctl enable systemd-networkd
+    chroot ${MOUNTDIR} apt-get -y install policykit-1
+    rm -fv ${MOUNTDIR}/etc/resolv.conf
+    chroot ${MOUNTDIR} ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
+  fi
 }
 #
 createCloudUser(){
