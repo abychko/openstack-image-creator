@@ -130,6 +130,8 @@ TTYVTDisallocate=no' > ${MOUNTDIR}/etc/systemd/system/getty@tty1.service.d/nocle
 #
 setHostname(){
   echo "${DISTRO}.${RELEASE}.openstack" > ${MOUNTDIR}/etc/hostname
+  rm -fv ${MOUNTDIR}/etc/resolv.conf
+  echo "# Created by OpenStack Image Creator at ${DATE}" > ${MOUNTDIR}/etc/resolv.conf
 }
 #
 createCloudUser(){
