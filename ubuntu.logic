@@ -132,6 +132,7 @@ setHostname(){
   echo "${DISTRO}.${RELEASE}.openstack" > ${MOUNTDIR}/etc/hostname
   rm -fv ${MOUNTDIR}/etc/resolv.conf
   echo "# Created by OpenStack Image Creator at ${DATE}" > ${MOUNTDIR}/etc/resolv.conf
+  chroot ${MOUNTDIR} apt-get -y install policykit-1
 }
 #
 createCloudUser(){
