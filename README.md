@@ -32,18 +32,18 @@ done
 ```
 
 # Script options
-### Required options are:  --distro <distro> --arch <arch> --release <release>
-* <distro> is centos|debian|ubuntu
-* <arch> is i386 |( amd64 | x86_64 )
-* <release> is depends on <distro>. it may be:
+### Required options are:  --distro *distro* --arch *arch* --release *release*
+* *distro* is centos | debian | ubuntu
+* *arch* is i386 |( amd64 | x86_64 )
+* *release* is depends on <distro>. it may be:
 *  => 6 | 7 for centos,
 *  => wheezy | jessie | stretch for debian
-*  => trusty | xenial | yakkety | zesty | artful  for ubuntu
+*  => precise | trusty | xenial | bionic | artful  for ubuntu
 
 ### Additional params, not required:
 * --with-jre, default is NO. Add JRE for Jenkins CI system
-* --imagesize <size>, default is 2G, for minimal image
+* --imagesize *size*, default is 2G, for minimal image
 * --remove-raw, default is no, to remove raw image after converting to compressed qcow2
 * --root-password, default is auto-generated
 * --cloud-user, default jenkins
-* --outdir <outdir>, default <distro>. Directory to store compressed qcow2 image and passwd file
+* --outdir *outdir*, default *distro*. Directory to store compressed qcow2 image and passwd file
