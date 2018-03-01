@@ -13,7 +13,7 @@ Where required are:
 
 Additional params, not required:
   --with-jre, default is NO. Add JRE for Jenkins CI system
-  --imagesize <size>, default is 2G, for minimal image
+  --imagesize <size>, default is 1G, for minimal image
   --remove-raw, default is no, to remove raw image after converting to compressed qcow2
   --root-password, default is auto-generated
   --cloud-user, default jenkins
@@ -38,7 +38,7 @@ DISTRO=debian
 ARCH=amd64
 RELEASE=jessie
 JRE=no
-IMAGESIZE=2 #G
+IMAGESIZE=1G # You may use k, M, G, T, P or E suffixes for kilobytes, megabytes, gigabytes, terabytes, petabytes and exabytes.
 EXTLINUX=$(which extlinux)
 PWGEN=$(which pwgen)
 QEMU_IMG=$(which qemu-img)
@@ -183,7 +183,7 @@ trap "cleanup" EXIT TERM INT
 #
 rm -fv ${RAW_IMAGE} ${OUTDIR}/${QCOW2_IMAGE}
 #
-${QEMU_IMG} create -f raw ${RAW_IMAGE} ${IMAGESIZE}G
+${QEMU_IMG} create -f raw ${RAW_IMAGE} ${IMAGESIZE}
 ${PARTED} -s ${RAW_IMAGE} mklabel msdos
 ${PARTED} -s -a optimal ${RAW_IMAGE} mkpart primary ext4 0% 100%
 ${PARTED} -s ${RAW_IMAGE} set 1 boot on
