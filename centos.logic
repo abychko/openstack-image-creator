@@ -14,7 +14,7 @@ if [ ${ARCH} = i386 ]; then
 fi
 #
 MIRROR=http://mirror.centos.org/centos-${RELEASE}/${RELEASE}/os/${ARCH}
-IMAGE_NEEDS="git openssh openssh-server openssh-clients"
+IMAGE_NEEDS="git openssh openssh-server openssh-clients audit"
 #
 createTempYumConf(){
   echo "[main]
@@ -137,6 +137,7 @@ cleanupSystem(){
   rm -f ${MOUNTDIR}/lib*/udev/write_net_rules
   echo "* cleaning downloaded YUM data and packages ..."
   ${cmdPREFIX} chroot ${MOUNTDIR} yum clean all
+  touch ${MOUNTDIR}/.autorelabel
 }
 #
 setupConsole(){
