@@ -19,7 +19,7 @@ for _release in wheezy jessie stretch; do
 done
 #
 # Ubuntu Images
-for _release in artful trusty xenial zesty; do
+for _release in artful bionic trusty xenial; do
   for _arch in i386 amd64; do
     ./openstack-image-creator.sh --with-jre --distro ubuntu --arch ${_arch} --release ${_release} --no-rebuild --remove-raw;
   done
