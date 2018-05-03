@@ -57,6 +57,8 @@ configureFSTab(){
 proc  /proc  proc  nodev,noexec,nosuid  0  0
 UUID=${UUID}  /  ext4  errors=remount-ro  0  1
 " > ${MOUNTDIR}/etc/fstab
+# avoiding micro /tmp of 1024k size
+  rm -fv ${MOUNTDIR}/etc/init/mounted-tmp.conf
 }
 #
 configureBoot(){
