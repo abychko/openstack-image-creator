@@ -62,8 +62,8 @@ UUID=${UUID}  /  ext4  errors=remount-ro  0  1
 configureBoot(){
   # Setting-up initramfs
   chroot ${MOUNTDIR} update-initramfs -u
-  KERNEL=`chroot ${MOUNTDIR} find boot -name 'vmlinuz-*'`
-  RAMDISK=`chroot ${MOUNTDIR} find boot -name 'initrd.img-*'`
+  KERNEL=$(chroot ${MOUNTDIR} find boot -name 'vmlinuz-*' | sort | tail -n 1)
+  RAMDISK=$(chroot ${MOUNTDIR} find boot -name 'initrd.img-*' | sort | tail -n 1)
   mkdir -p ${MOUNTDIR}/boot/extlinux
   extlinux --install ${MOUNTDIR}/boot/extlinux
   chroot ${MOUNTDIR} ln -snf . /boot/boot

@@ -106,8 +106,8 @@ adjustCloudSettings(){
   cp ${MOUNTDIR}/usr/share/zoneinfo/America/New_York ${MOUNTDIR}/etc/localtime
 }
 configureBoot(){
-  KERNEL=$(chroot ${MOUNTDIR} find boot -name 'vmlinuz-*')
-  RAMDISK=$(chroot ${MOUNTDIR} find boot -name 'initramfs-*.img')
+  KERNEL=$(chroot ${MOUNTDIR} find boot -name 'vmlinuz-*' | sort | tail -n 1)
+  RAMDISK=$(chroot ${MOUNTDIR} find boot -name 'initramfs-*.img' | sort | tail -n 1)
   kVERSION=$(echo ${RAMDISK%.img} | awk -F'-' '{print $2"-"$3}')
   mkdir -p ${MOUNTDIR}/boot/extlinux
   extlinux --install ${MOUNTDIR}/boot/extlinux
