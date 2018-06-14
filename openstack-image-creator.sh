@@ -205,8 +205,7 @@ mkfs.ext4 -O ^64bit /dev/mapper/${LOOP_DEVICE}
 tune2fs -c 0 /dev/mapper/${LOOP_DEVICE}
 mount -o loop /dev/mapper/${LOOP_DEVICE} ${MOUNTDIR}
 export UUID=$(blkid -o value -s UUID /dev/mapper/${LOOP_DEVICE})
-##
-installBaseSystem
+mkdir -p ${MOUNTDIR}/{proc,sys,dev}
 ##
 # mount /proc, /dev, /sys
 mount -t proc /proc ${MOUNTDIR}/proc
@@ -214,6 +213,8 @@ mount --rbind /sys ${MOUNTDIR}/sys
 mount --make-rslave ${MOUNTDIR}/sys
 mount --rbind /dev ${MOUNTDIR}/dev
 mount --make-rslave ${MOUNTDIR}/dev
+#
+installBaseSystem
 #
 chroot ${MOUNTDIR} rm -f /etc/mtab
 chroot ${MOUNTDIR} ln -s /proc/mounts /etc/mtab

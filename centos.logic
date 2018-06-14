@@ -53,7 +53,7 @@ installBaseSystem(){
   echo "nameserver 8.8.8.8" > ${MOUNTDIR}/etc/resolv.conf
   createTempYumConf
   createImageYumConf
-  ${cmdPREFIX} ${YUM} --config=/tmp/yum.conf --installroot=${MOUNTDIR} install -y rpm yum
+  ${cmdPREFIX} ${YUM} -y --config=/tmp/yum.conf --installroot=${MOUNTDIR} install -y rpm yum
   chroot ${MOUNTDIR} rpm -i --force /centos-release-${RELEASE}.rpm
   ${cmdPREFIX} chroot ${MOUNTDIR} yum -y groupinstall base
   rm -fv /tmp/yum.conf ${MOUNTDIR}/centos-release-${RELEASE}.rpm
