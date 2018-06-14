@@ -54,7 +54,7 @@ installBaseSystem(){
   createTempYumConf
   createImageYumConf
   ${cmdPREFIX} ${YUM} -y --config=/tmp/yum.conf --installroot=${MOUNTDIR} install -y rpm yum
-  chroot ${MOUNTDIR} rpm -i --force /centos-release-${RELEASE}.rpm
+  chroot ${MOUNTDIR} rpm -i --force --nodeps /centos-release-${RELEASE}.rpm
   ${cmdPREFIX} chroot ${MOUNTDIR} yum -y groupinstall base
   rm -fv /tmp/yum.conf ${MOUNTDIR}/centos-release-${RELEASE}.rpm
 }
