@@ -116,7 +116,7 @@ configureBoot(){
 timeout 10
 label linux
 kernel /${KERNEL}
-append initrd=/${RAMDISK} root=UUID=${UUID} rootfstype=ext4 console=tty0 console=ttyS0,115200 net.ifnames=0 fips=1" > ${MOUNTDIR}/boot/extlinux/extlinux.conf
+append initrd=/${RAMDISK} root=UUID=${UUID} rootfstype=ext4 console=tty0 console=ttyS0,115200 net.ifnames=0 fips=0" > ${MOUNTDIR}/boot/extlinux/extlinux.conf
   ${cmdPREFIX} chroot ${MOUNTDIR} dracut --add-drivers "virtio_pci virtio_blk virtio_scsi virtio_net virtio_ring virtio" -v -f /boot/initramfs-${kVERSION}.img ${kVERSION}
 }
 #
