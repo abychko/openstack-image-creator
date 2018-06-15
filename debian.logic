@@ -21,7 +21,7 @@ fi
 #
 installBaseSystem(){
   echo "* Installing Debian ${RELEASE} ${ARCH} system to ${MOUNTDIR}"
-  debootstrap --arch=${ARCH} --verbose --include=${PKGLIST},${KERNEL} ${RELEASE} ${MOUNTDIR} ${MIRROR}
+  debootstrap --no-check-gpg --arch=${ARCH} --verbose --include=${PKGLIST},${KERNEL} ${RELEASE} ${MOUNTDIR} ${MIRROR}
 }
 #
 setLocale(){
