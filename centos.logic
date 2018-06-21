@@ -55,7 +55,9 @@ installBaseSystem(){
   ${cmdPREFIX} ${YUM} -y --config=/tmp/yum.conf --installroot=${MOUNTDIR} install rpm yum
   chroot ${MOUNTDIR} rpm -i --force --nodeps /centos-release-${RELEASE}.rpm
   rm -fv /tmp/yum.conf ${MOUNTDIR}/centos-release-${RELEASE}.rpm
-  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install @core kernel
+  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install kernel
+  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install @core
+  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y clean all
 }
 #
 configureFSTab(){
