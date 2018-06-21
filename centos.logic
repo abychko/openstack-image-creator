@@ -50,7 +50,6 @@ installBaseSystem(){
   ${RPM} -i --root=${MOUNTDIR} --nodeps ${MOUNTDIR}/centos-release-${RELEASE}.rpm
   mkdir -p /etc/pki/rpm-gpg
   cp -av ${MOUNTDIR}/etc/pki/rpm-gpg/* /etc/pki/rpm-gpg
-  echo "nameserver 8.8.8.8" > ${MOUNTDIR}/etc/resolv.conf
   createTempYumConf
   createImageYumConf
   ${cmdPREFIX} ${YUM} -y --config=/tmp/yum.conf --installroot=${MOUNTDIR} install -y rpm yum
