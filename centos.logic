@@ -55,9 +55,7 @@ installBaseSystem(){
   ${cmdPREFIX} ${YUM} -y --config=/tmp/yum.conf --installroot=${MOUNTDIR} install rpm yum
   chroot ${MOUNTDIR} rpm -i --force --nodeps /centos-release-${RELEASE}.rpm
   rm -fv /tmp/yum.conf ${MOUNTDIR}/centos-release-${RELEASE}.rpm
-  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install kernel
-  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install @core
-  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y clean all
+  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y groupinstall base
 }
 #
 configureFSTab(){
@@ -89,7 +87,7 @@ createRepositories(){
 #
 upgradeSystem(){
   ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install dhclient sudo cloud-init cloud-utils-growpart dracut-modules-growroot kernel syslinux-extlinux
-  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install selinux-policy selinux-policy-targeted acpid dracut-fips dracut-fips-aesni
+  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install selinux-policy selinux-policy-targeted acpid dracut-fips dracut-fips-aesni python-argparse
   ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install ${IMAGE_NEEDS}
   ${cmdPREFIX} chroot ${MOUNTDIR} yum -y upgrade
   ${cmdPREFIX} chroot ${MOUNTDIR} sed -i 's:SELINUX=enforcing:SELINUX=permissive:g' /etc/selinux/config
@@ -139,6 +137,9 @@ cleanupSystem(){
   echo "* cleaning downloaded YUM data and packages ..."
   ${cmdPREFIX} chroot ${MOUNTDIR} yum clean all
   touch ${MOUNTDIR}/.autorelabel
+  if [ ${RELEASE} -gt 6 ]; then
+    rm -fr ${MOUNTDIR}/var/run
+  fi
 }
 #
 setupConsole(){
