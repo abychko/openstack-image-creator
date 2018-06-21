@@ -52,10 +52,10 @@ installBaseSystem(){
   cp -av ${MOUNTDIR}/etc/pki/rpm-gpg/* /etc/pki/rpm-gpg
   createTempYumConf
   createImageYumConf
-  ${cmdPREFIX} ${YUM} -y --config=/tmp/yum.conf --installroot=${MOUNTDIR} install -y rpm yum
+  ${cmdPREFIX} ${YUM} -y --config=/tmp/yum.conf --installroot=${MOUNTDIR} install rpm yum
   chroot ${MOUNTDIR} rpm -i --force --nodeps /centos-release-${RELEASE}.rpm
-  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y groupinstall base
   rm -fv /tmp/yum.conf ${MOUNTDIR}/centos-release-${RELEASE}.rpm
+  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install @core kernel
 }
 #
 configureFSTab(){

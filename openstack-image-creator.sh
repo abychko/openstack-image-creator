@@ -207,21 +207,20 @@ mount -o loop /dev/mapper/${LOOP_DEVICE} ${MOUNTDIR}
 export UUID=$(blkid -o value -s UUID /dev/mapper/${LOOP_DEVICE})
 mkdir -p ${MOUNTDIR}/{proc,sys,dev,etc}
 ##
-if [ ${DISTRO} != centos ]; then
-  installBaseSystem
-fi
+#
+mknod -m 0666 ${MOUNTDIR}/dev/random c 1 8
+mknod -m 0666 ${MOUNTDIR}/dev/urandom c 1 9
+#
 # mount /proc, /dev, /sys
-mount -t proc /proc ${MOUNTDIR}/proc
-mount --rbind /sys ${MOUNTDIR}/sys
-mount --make-rslave ${MOUNTDIR}/sys
-mount --rbind /dev ${MOUNTDIR}/dev
-mount --make-rslave ${MOUNTDIR}/dev
+#mount -t proc /proc ${MOUNTDIR}/proc
+#mount --rbind /sys ${MOUNTDIR}/sys
+#mount --make-rslave ${MOUNTDIR}/sys
+#mount --rbind /dev ${MOUNTDIR}/dev
+#mount --make-rslave ${MOUNTDIR}/dev
 #
 cat /etc/resolv.conf > ${MOUNTDIR}/etc/resolv.conf
 #
-if [ ${DISTRO} = centos ]; then
-  installBaseSystem
-fi
+installBaseSystem
 #
 chroot ${MOUNTDIR} rm -f /etc/mtab
 chroot ${MOUNTDIR} ln -s /proc/mounts /etc/mtab
