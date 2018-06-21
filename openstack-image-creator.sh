@@ -194,7 +194,7 @@ if echo "${RESULT_KPARTX}" | grep "^add map" ; then
   LOOP_DEVICE=`echo ${RESULT_KPARTX} | cut -d" " -f3`
   echo "kpartx mounted using: ${LOOP_DEVICE}"
 else
-  echo "It seems kpartx didn't mount the image correctly: exiting."
+  echo "It seems kpartx didn't mount the image correctly, exiting."
   exit 1
 fi
 #
