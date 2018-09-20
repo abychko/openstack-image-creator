@@ -136,7 +136,7 @@ cleanupSystem(){
   rm -f ${MOUNTDIR}/lib*/udev/write_net_rules
   echo "* cleaning downloaded YUM data and packages ..."
   ${cmdPREFIX} chroot ${MOUNTDIR} yum clean all
-  touch ${MOUNTDIR}/.autorelabel
+  ${cmdPREFIX} chroot ${MOUNTDIR} /sbin/fixfiles -f -F relabel
   if [ ${RELEASE} -gt 6 ]; then
     rm -fr ${MOUNTDIR}/var/run
   fi
