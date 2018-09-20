@@ -136,7 +136,9 @@ cleanupSystem(){
   rm -f ${MOUNTDIR}/lib*/udev/write_net_rules
   echo "* cleaning downloaded YUM data and packages ..."
   ${cmdPREFIX} chroot ${MOUNTDIR} yum clean all
-  ${cmdPREFIX} chroot ${MOUNTDIR} /sbin/fixfiles -f -F relabel
+
+  echo "/sbin/fixfiles -F restore" ${MOUNTDIR}/etc/rc.d/rc.local
+
   if [ ${RELEASE} -gt 6 ]; then
     rm -fr ${MOUNTDIR}/var/run
   fi
