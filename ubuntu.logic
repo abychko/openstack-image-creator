@@ -129,7 +129,7 @@ TTYVTDisallocate=no' > ${MOUNTDIR}/etc/systemd/system/getty@tty1.service.d/nocle
 #
 setHostname(){
   echo "${DISTRO}.${RELEASE}.openstack" > ${MOUNTDIR}/etc/hostname
-  if [ ${RELEASE} = artful -o ${RELEASE} = bionic ]; then
+  if [[ ${RELEASE} = artful ]] || [[ ${RELEASE} = bionic ]] || [[ ${RELEASE} = cosmic ]]; then
     chroot ${MOUNTDIR} systemctl enable systemd-networkd
     chroot ${MOUNTDIR} apt-get -y install policykit-1
     rm -fv ${MOUNTDIR}/etc/resolv.conf
