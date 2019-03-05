@@ -24,18 +24,18 @@ obsoletes=1
 debuglevel=2
 gpgcheck=0
 " > /tmp/yum.conf
+  pushd /etc/yum.repos.d/
+    wget https://jenkins.percona.com/yum-repo/rhel8/rhel8-beta.repo
+  popd
 }
 #
 createImageYumConf(){
   mkdir -p ${MOUNTDIR}/etc/yum
-  cat < EOF > ${MOUNTDIR}/etc/yum/yum.conf
-"
-[main]
+  echo "[main]
 gpgcheck=1
 installonly_limit=3
 clean_requirements_on_remove=True
-EOF
-"
+" > ${MOUNTDIR}/etc/yum/yum.conf
 }
 #
 installBaseSystem(){
@@ -129,6 +129,7 @@ cleanupSystem(){
   if [ ${RELEASE} -gt 6 ]; then
     rm -fr ${MOUNTDIR}/var/run
   fi
+  rm -f /etc/yum.repos.d/rhel8-beta.repo
 }
 #
 setupConsole(){
