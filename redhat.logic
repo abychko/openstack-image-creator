@@ -95,13 +95,14 @@ configureBoot(){
   RAMDISK=$(chroot ${MOUNTDIR} find boot -name 'initramfs-*.img' | sort | tail -n 1)
   kVERSION=$(echo ${RAMDISK%.img} | awk -F'-' '{print $2"-"$3}')
   mkdir -p ${MOUNTDIR}/boot/extlinux
-  extlinux --install ${MOUNTDIR}/boot/extlinux
-  #chroot ${MOUNTDIR} ln -snf . /boot/boot
   echo "default linux
 timeout 10
 label linux
 kernel /${KERNEL}
 append initrd=/${RAMDISK} root=UUID=${UUID} rootfstype=ext4 console=tty0 console=ttyS0,115200 net.ifnames=0 fips=0" > ${MOUNTDIR}/boot/extlinux/extlinux.conf
+  #
+  extlinux --install ${MOUNTDIR}/boot/extlinux
+  #
   ${cmdPREFIX} chroot ${MOUNTDIR} dracut --add-drivers "virtio_pci virtio_blk virtio_scsi virtio_net virtio_ring virtio" -v -f /boot/initramfs-${kVERSION}.img ${kVERSION}
 }
 #
