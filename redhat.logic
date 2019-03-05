@@ -24,9 +24,6 @@ obsoletes=1
 debuglevel=2
 gpgcheck=0
 " > /tmp/yum.conf
-  pushd /etc/yum.repos.d/
-    wget https://jenkins.percona.com/yum-repo/rhel8/rhel8-beta.repo
-  popd
 }
 #
 createImageYumConf(){
@@ -45,6 +42,8 @@ installBaseSystem(){
   REDHAT_RELEASE_RPM=$(lynx --dump ${MIRROR}/Packages | egrep -o "http.*redhat-release-.*rpm")
   wget ${REDHAT_RELEASE_RPM} -O ${MOUNTDIR}/redhat-release-${RELEASE}.rpm
   ${RPM} -i --root=${MOUNTDIR} --nodeps ${MOUNTDIR}/redhat-release-${RELEASE}.rpm
+  mkdir -p ${MOUNTDIR}/etc/yum.repos.d
+  wget https://jenkins.percona.com/yum-repo/rhel8/rhel8-beta.repo -O ${MOUNTDIR}/etc/yum.repos.d/rhel8-beta.repo
   mkdir -p /etc/pki/rpm-gpg
   cp -av ${MOUNTDIR}/etc/pki/rpm-gpg/* /etc/pki/rpm-gpg
   createTempYumConf
@@ -52,7 +51,7 @@ installBaseSystem(){
   ${cmdPREFIX} ${YUM} -y --config=/tmp/yum.conf --installroot=${MOUNTDIR} install rpm yum
   chroot ${MOUNTDIR} rpm -i --force --nodeps /redhat-release-${RELEASE}.rpm
   rm -fv /tmp/yum.conf ${MOUNTDIR}/redhat-release-${RELEASE}.rpm
-  wget https://jenkins.percona.com/yum-repo/rhel8/rhel8-beta.repo -O ${MOUNTDIR}/etc/yum.repos.d/rhel8-beta.repo
+
   ${cmdPREFIX} chroot ${MOUNTDIR} yum -y groupinstall base
 }
 #
