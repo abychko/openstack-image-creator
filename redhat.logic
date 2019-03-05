@@ -82,7 +82,7 @@ upgradeSystem(){
 adjustCloudSettings(){
 #Allow SSH in as root, even though it might be unsecure
   sed -i 's/disable_root: true/disable_root: false/' ${MOUNTDIR}/etc/cloud/cloud.cfg
-  sed -i "s/name: centos/name: ${CLOUD_USER}/" ${MOUNTDIR}/etc/cloud/cloud.cfg
+  sed -i "s/name: cloud-user/name: ${CLOUD_USER}/" ${MOUNTDIR}/etc/cloud/cloud.cfg
 #Since we implemented backdoor we want to be able to use it :)
   sed -i 's/PermitRootLogin yes/PermitRootLogin without-password/' ${MOUNTDIR}/etc/ssh/sshd_config
 # copy SKEL to root userdir
@@ -96,7 +96,7 @@ configureBoot(){
   kVERSION=$(echo ${RAMDISK%.img} | awk -F'-' '{print $2"-"$3}')
   mkdir -p ${MOUNTDIR}/boot/extlinux
   extlinux --install ${MOUNTDIR}/boot/extlinux
-  chroot ${MOUNTDIR} ln -snf . /boot/boot
+  #chroot ${MOUNTDIR} ln -snf . /boot/boot
   echo "default linux
 timeout 10
 label linux

@@ -202,7 +202,7 @@ fi
 sleep 5
 ##
 mkfs.ext4 -O ^64bit /dev/mapper/${LOOP_DEVICE}
-tune2fs -c 0 /dev/mapper/${LOOP_DEVICE}
+tune2fs -c 0 -LROOT /dev/mapper/${LOOP_DEVICE}
 mount -o loop /dev/mapper/${LOOP_DEVICE} ${MOUNTDIR}
 export UUID=$(blkid -o value -s UUID /dev/mapper/${LOOP_DEVICE})
 mkdir -p ${MOUNTDIR}/{proc,sys,dev,etc}
