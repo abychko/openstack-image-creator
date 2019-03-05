@@ -105,7 +105,7 @@ append initrd=/${RAMDISK} root=UUID=${UUID} rootfstype=ext4 console=tty0 console
   #
   extlinux --install ${MOUNTDIR}/boot/extlinux
   #
-  ${cmdPREFIX} chroot ${MOUNTDIR} dracut --add-drivers "virtio_crypto virtio_net virtio_scsi virtio_blk virtio-gpu virtio_input virtio_balloon virtio_console ahci " -v -f /boot/initramfs-${kVERSION}.img ${kVERSION}
+  ${cmdPREFIX} chroot ${MOUNTDIR} dracut --add-drivers "virtio_crypto virtio_net virtio_scsi virtio_blk virtio-gpu virtio_input virtio_balloon virtio_console" -v -f /boot/initramfs-${kVERSION}.img ${kVERSION}
 }
 #
 configureNetwork(){
