@@ -89,6 +89,7 @@ adjustCloudSettings(){
   cp -v ${MOUNTDIR}/etc/skel/.b* ${MOUNTDIR}/root/
 #set timezone
   cp ${MOUNTDIR}/usr/share/zoneinfo/America/New_York ${MOUNTDIR}/etc/localtime
+  touch ${MOUNTDIR}/etc/sysconfig/network-scripts/network-functions
 }
 configureBoot(){
   KERNEL=$(chroot ${MOUNTDIR} find boot -name 'vmlinuz-*' | sort | tail -n 1)
