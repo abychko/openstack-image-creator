@@ -73,7 +73,7 @@ createRepositories(){
 #
 upgradeSystem(){
   ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install dhclient sudo cloud-init cloud-utils-growpart kernel syslinux-extlinux network-scripts
-  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install selinux-policy selinux-policy-targeted acpid dracut-fips dracut-fips-aesni
+  ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install selinux-policy selinux-policy-targeted acpid
   ${cmdPREFIX} chroot ${MOUNTDIR} yum -y install ${IMAGE_NEEDS}
   ${cmdPREFIX} chroot ${MOUNTDIR} yum -y upgrade
   ${cmdPREFIX} chroot ${MOUNTDIR} sed -i 's:SELINUX=enforcing:SELINUX=permissive:g' /etc/selinux/config
@@ -101,7 +101,7 @@ configureBoot(){
 timeout 10
 label linux
 kernel /${KERNEL}
-append initrd=/${RAMDISK} root=UUID=${UUID} rootfstype=ext4 console=tty0 console=ttyS0,115200 net.ifnames=0 fips=0" > ${MOUNTDIR}/boot/extlinux/extlinux.conf
+append initrd=/${RAMDISK} root=UUID=${UUID} rootfstype=ext4 console=tty0 console=ttyS0,115200 net.ifnames=0" > ${MOUNTDIR}/boot/extlinux/extlinux.conf
   #
   extlinux --install ${MOUNTDIR}/boot/extlinux
   #
