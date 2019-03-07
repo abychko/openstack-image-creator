@@ -28,7 +28,6 @@ createRepositories(){
   echo "deb ${MIRROR} ${RELEASE} main restricted universe multiverse" > ${MOUNTDIR}/etc/apt/sources.list
   echo "deb ${MIRROR} ${RELEASE}-updates main restricted universe multiverse" >> ${MOUNTDIR}/etc/apt/sources.list
   echo "deb ${MIRROR} ${RELEASE}-security main restricted universe multiverse" >> ${MOUNTDIR}/etc/apt/sources.list
-  echo "deb ${MIRROR} ${RELEASE}-backports main restricted universe multiverse" >> ${MOUNTDIR}/etc/apt/sources.list
   chroot ${MOUNTDIR} apt-get update
 }
 #
