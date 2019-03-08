@@ -35,6 +35,9 @@ createRepositories(){
   echo "deb ${MIRROR} ${RELEASE} main contrib non-free" > ${MOUNTDIR}/etc/apt/sources.list
   echo "deb ${MIRROR} ${RELEASE}-updates main contrib non-free" >> ${MOUNTDIR}/etc/apt/sources.list
   echo "deb http://security.debian.org/ ${RELEASE}/updates main contrib non-free" >> ${MOUNTDIR}/etc/apt/sources.list
+  if [[ ${BACKPORTS} = yes ]]; then
+    echo "deb ${MIRROR} ${RELEASE}-updates main contrib non-free" >> ${MOUNTDIR}/etc/apt/sources.list
+  fi
   chroot ${MOUNTDIR} apt-get update
 }
 #

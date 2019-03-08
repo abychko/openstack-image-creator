@@ -49,6 +49,7 @@ REMOVE_RAW=no
 INTERACTIVE=no
 REBUILD=yes
 CLOUD_USER=jenkins
+BACKPORTS=yes
 #
 #
 # Trying to parse the options passed to script
@@ -96,6 +97,10 @@ while [ $# -gt 0 ]; do
       ;;
     --no-rebuild )
       export REBUILD=no
+      shift
+      ;;
+    --disable-backports )
+      export BACKPORTS=no
       shift
       ;;
     *)
