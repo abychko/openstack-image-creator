@@ -79,6 +79,10 @@ append initrd=/${RAMDISK} root=UUID=${UUID} rootfstype=ext4 console=tty0 console
 }
 #
 configureNetwork(){
+#
+  mkdir -p /etc/network
+  chroot ${MOUNTDIR} apt-get -y install ifupdown
+#
   echo "# This file describes the network interfaces available on your system
 # and how to activate them. For more information, see interfaces(5).
 
