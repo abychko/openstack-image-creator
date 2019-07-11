@@ -4,13 +4,13 @@ Shell script to create images for OpenStack, inspired by https://github.com/mare
 # Installing dependencies (assuming Ubuntu Xenial 16.04 amd64)
 * $ sudo apt-get update
 * $ export DEBIAN_FRONTEND=noninteractive
-* $ sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"  dist-upgrade
-* $ sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"  install debootstrap lynx rpm yum pwgen qemu-utils parted kpartx mbr
+* $ sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" dist-upgrade
+* $ sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install debootstrap lynx rpm yum pwgen qemu-utils parted kpartx mbr extlinux pv
 * $
 
 # Example, build Centos images
 ```
-sudo bash -x ./openstack-image-creator.sh --distro centos --arch i386 --release 6 --remove-raw --outdir IMAGES
+sudo bash -x ./openstack-image-creator.sh --distro centos --arch i386   --release 6 --remove-raw --outdir IMAGES
 sudo bash -x ./openstack-image-creator.sh --distro centos --arch x86_64 --release 6 --remove-raw --outdir IMAGES
 sudo bash -x ./openstack-image-creator.sh --distro centos --arch x86_64 --release 7 --remove-raw --outdir IMAGES
 ```
@@ -45,5 +45,5 @@ done
 * --imagesize *size*, default is 2G, for minimal image
 * --remove-raw, default is no, to remove raw image after converting to compressed qcow2
 * --root-password, default is auto-generated
-* --cloud-user, default jenkins
+* --cloud-user, default virt-user
 * --outdir *outdir*, default *distro*. Directory to store compressed qcow2 image and passwd file

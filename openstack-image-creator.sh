@@ -16,8 +16,9 @@ Additional params, not required:
   --imagesize <size>, default is 1G, for minimal image
   --remove-raw, default is no, to remove raw image after converting to compressed qcow2
   --root-password, default is auto-generated
-  --cloud-user, default jenkins
+  --cloud-user, default virt-user
   --outdir <outdir>, default <distro>. Directory to store compressed qcow2 image and passwd file
+  --openstack <yes|no>, default no. Create simple KVM image or adjust it for OpenStack
   "
 }
 #
@@ -36,7 +37,7 @@ cd $(readlink -f $(dirname $0))
 DATE=$(date +%Y%m%d)
 DISTRO=debian
 ARCH=amd64
-RELEASE=jessie
+RELEASE=buster
 JRE=no
 IMAGESIZE=2G # You may use k, M, G, T, P or E suffixes for kilobytes, megabytes, gigabytes, terabytes, petabytes and exabytes.
 EXTLINUX=$(which extlinux)
@@ -48,8 +49,9 @@ ROOT_PASSWORD=$(pwgen -s 14 1)
 REMOVE_RAW=no
 INTERACTIVE=no
 REBUILD=yes
-CLOUD_USER=jenkins
+CLOUD_USER=virt-user
 BACKPORTS=yes
+OPENSTACK=no
 #
 #
 # Trying to parse the options passed to script
@@ -87,6 +89,10 @@ while [ $# -gt 0 ]; do
       export CLOUD_USER=$2
       shift 2
       ;;
+    --openstack )
+      export OPENSTACK=yes
+      shift
+      ;;
     --outdir )
       export OUTDIR=$2
       shift 2
@@ -122,11 +128,11 @@ if [ -z "${JRE_DOWNLOAD_SERVER}" ]; then
 fi
 #
 if [ -z ${JRE_VERSION} ]; then
-  JRE_VERSION="8u152"
+  JRE_VERSION="8u241"
 fi
 #
 if [ -z ${JRE_DIRNAME} ]; then
-  JRE_DIRNAME="jre1.8.0_152"
+  JRE_DIRNAME="jre1.8.0_241"
 fi
 #
 JRE_TARBALL="jre-${JRE_VERSION}-linux-${ARCH}.tar.gz"
@@ -192,7 +198,7 @@ ${QEMU_IMG} create -f raw ${RAW_IMAGE} ${IMAGESIZE}
 ${PARTED} -s ${RAW_IMAGE} mklabel msdos
 ${PARTED} -s -a optimal ${RAW_IMAGE} mkpart primary ext4 0% 100%
 ${PARTED} -s ${RAW_IMAGE} set 1 boot on
-install-mbr ${RAW_IMAGE}
+install-mbr --force ${RAW_IMAGE}
 RESULT_KPARTX=`kpartx -av ${RAW_IMAGE} 2>&1`
 #
 if echo "${RESULT_KPARTX}" | grep "^add map" ; then
@@ -271,7 +277,7 @@ chroot ${MOUNTDIR} chown -R ${CLOUD_USER} /home/${CLOUD_USER}
 #
 # Fill up free space with zeroes
 echo "* filling up the free image space with zeroes ..."
-dd if=/dev/zero of=${MOUNTDIR}/zerofile || true
+dd if=/dev/zero of=${MOUNTDIR}/zerofile status=progress || true
 rm -fv ${MOUNTDIR}/zerofile
 #
 sync && sync
